@@ -3,345 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Q-System</title>
+    <title>Admin Dashboard | Management</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Prompt', 'sans-serif'] } } } }
-    </script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
-        body { background: #f8f9fa; color: #212529; }
-        .sidebar-link { display: flex; items-center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #6c757d; font-weight: 500; transition: 0.2s; }
-        .sidebar-link:hover, .sidebar-link.active { background: #000; color: #fff; }
-        .stat-card { background: white; padding: 24px; border-radius: 16px; border: 1px solid #e9ecef; }
-        .table-row { transition: 0.1s; border-bottom: 1px solid #f1f3f5; }
-        .table-row:hover { background: #f8f9fa; }
-        .input-admin { border: 1px solid #dee2e6; padding: 8px 12px; border-radius: 6px; font-size: 14px; width: 100%; outline: none; }
-        .input-admin:focus { border-color: #000; }
-        .btn-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 700; border: 1px solid #e9ecef; background: white; }
-        .btn-status.active { background: #000; color: white; border-color: #000; }
+        body { font-family: 'Prompt', sans-serif; background: #f8f9fa; }
+        .sidebar { width: 260px; height: 100vh; background: #fff; border-right: 1px solid #eee; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; }
+        .main-content { margin-left: 260px; padding: 40px; }
         
-        /* Modal Animation */
-        .modal { transition: opacity 0.2s, visibility 0.2s; opacity: 0; visibility: hidden; }
-        .modal.show { opacity: 1; visibility: visible; }
+        .stat-card { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #eee; }
+        .table-container { background: #fff; border-radius: 16px; border: 1px solid #eee; overflow: hidden; margin-top: 30px; }
+        
+        .btn-status { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer; transition: 0.2s; }
+        .btn-status:hover { background: #f0f0f0; }
+        .btn-status.active { background: #000; color: #fff; border-color: #000; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-box { background: #fff; width: 100%; max-width: 500px; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body>
 
-    <div id="login-overlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+    <div id="login-overlay" class="fixed inset-0 bg-white z-[999] flex items-center justify-center">
         <div class="w-80 text-center">
-            <div class="w-12 h-12 bg-black text-white rounded-lg mx-auto flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-lock"></i></div>
-            <h2 class="text-xl font-bold mb-6">Security Check</h2>
-            <div class="space-y-3">
-                <input id="adm-email" value="faris@gmail.com" class="input-admin text-center" placeholder="Admin Email">
-                <input id="adm-pass" type="password" class="input-admin text-center" placeholder="Password">
-                <button onclick="login()" class="w-full bg-black text-white py-2 rounded-lg font-bold hover:opacity-80">Access Panel</button>
-            </div>
+            <h2 class="text-2xl font-bold mb-6">Admin Access</h2>
+            <input id="adm-email" value="faris@gmail.com" class="w-full p-3 bg-gray-50 border rounded-lg mb-3 text-center" placeholder="Email">
+            <input id="adm-pass" type="password" class="w-full p-3 bg-gray-50 border rounded-lg mb-4 text-center" placeholder="Password">
+            <button onclick="AdminAuth.login()" class="w-full bg-black text-white py-3 rounded-lg font-bold">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col justify-between p-6">
-        <div>
-            <div class="font-bold text-2xl tracking-tighter mb-10 flex items-center gap-2">
-                <i class="fa-solid fa-cube text-xl"></i> Admin.
-            </div>
-            <nav class="space-y-2">
-                <a href="#" class="sidebar-link active"><i class="fa-solid fa-chart-pie"></i> ภาพรวม (Overview)</a>
-                <a href="#" onclick="alert('Coming in v2')" class="sidebar-link"><i class="fa-solid fa-users"></i> ลูกค้า (Users)</a>
-                <a href="#" onclick="toggleAnncModal()" class="sidebar-link"><i class="fa-solid fa-bullhorn"></i> ประกาศ (News)</a>
-            </nav>
+    <aside class="sidebar">
+        <div class="font-bold text-2xl tracking-tighter mb-10 flex items-center gap-3">
+            <i class="fa-solid fa-cube"></i> Admin.
         </div>
-        <button onclick="logout()" class="text-left text-sm text-red-500 font-bold hover:underline"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</button>
+        <nav class="flex-1 space-y-2">
+            <a href="#" class="block p-3 bg-black text-white rounded-lg font-bold"><i class="fa-solid fa-chart-pie mr-2"></i> ภาพรวม</a>
+            <a href="#" onclick="UI.toggleAnncModal()" class="block p-3 text-gray-500 hover:bg-gray-50 rounded-lg font-bold"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</a>
+        </nav>
+        <button onclick="AdminAuth.logout()" class="text-red-500 font-bold text-sm text-left hover:underline">ออกจากระบบ</button>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-8 relative">
-        <header class="flex justify-between items-center mb-10">
+    <div class="main-content">
+        <header class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-2xl font-bold">Dashboard</h1>
-                <p class="text-gray-400 text-sm">จัดการคำสั่งซื้อทั้งหมดในระบบ</p>
+                <h1 class="text-3xl font-bold">Dashboard</h1>
+                <p class="text-gray-400">ภาพรวมคำสั่งซื้อทั้งหมด</p>
             </div>
-            <div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> System Online
+            <div class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> Online
             </div>
         </header>
 
-        <div class="grid grid-cols-4 gap-6 mb-10">
+        <div class="grid grid-cols-4 gap-6">
             <div class="stat-card">
-                <div class="text-gray-400 text-xs font-bold uppercase mb-2">รอรับงาน (Pending)</div>
-                <div class="text-3xl font-bold" id="stat-pending">0</div>
+                <div class="text-xs font-bold text-gray-400 uppercase mb-2">งานใหม่ (Pending)</div>
+                <div id="count-pending" class="text-4xl font-bold">0</div>
             </div>
             <div class="stat-card">
-                <div class="text-gray-400 text-xs font-bold uppercase mb-2">กำลังทำ (Working)</div>
-                <div class="text-3xl font-bold text-blue-600" id="stat-working">0</div>
+                <div class="text-xs font-bold text-gray-400 uppercase mb-2">กำลังทำ (Active)</div>
+                <div id="count-active" class="text-4xl font-bold text-blue-600">0</div>
             </div>
             <div class="stat-card">
-                <div class="text-gray-400 text-xs font-bold uppercase mb-2">เสร็จสิ้น (Done)</div>
-                <div class="text-3xl font-bold text-green-600" id="stat-done">0</div>
+                <div class="text-xs font-bold text-gray-400 uppercase mb-2">เสร็จสิ้น (Done)</div>
+                <div id="count-done" class="text-4xl font-bold text-green-600">0</div>
             </div>
             <div class="stat-card bg-black text-white border-black">
-                <div class="text-gray-400 text-xs font-bold uppercase mb-2">คำสั่งซื้อทั้งหมด</div>
-                <div class="text-3xl font-bold" id="stat-total">0</div>
+                <div class="text-xs font-bold text-gray-400 uppercase mb-2">รวมทั้งหมด</div>
+                <div id="count-total" class="text-4xl font-bold">0</div>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="font-bold text-lg">รายการคำสั่งซื้อล่าสุด</h3>
-                <input onkeyup="filterTable()" id="search-box" placeholder="ค้นหาชื่อร้าน..." class="input-admin w-64">
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
-                        <tr>
-                            <th class="p-4 pl-6">ชื่อโปรเจกต์</th>
-                            <th class="p-4">ลูกค้า</th>
-                            <th class="p-4">วันที่สั่ง</th>
-                            <th class="p-4">สถานะ</th>
-                            <th class="p-4">การจัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" class="divide-y divide-gray-100">
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <div id="modal-annc" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl p-6 w-96 shadow-2xl">
-            <h3 class="font-bold text-lg mb-4">ตั้งค่าประกาศหน้าเว็บ</h3>
-            <div class="space-y-3">
-                <input id="annc-title" class="input-admin" placeholder="หัวข้อประกาศ">
-                <textarea id="annc-msg" class="input-admin h-24 resize-none" placeholder="ข้อความรายละเอียด..."></textarea>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="annc-active" class="w-4 h-4">
-                    <label for="annc-active" class="text-sm">แสดงผลทันที</label>
-                </div>
-                <div class="flex gap-2 pt-2">
-                    <button onclick="toggleAnncModal()" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold">ยกเลิก</button>
-                    <button onclick="saveAnnc()" class="flex-1 py-2 bg-black text-white rounded-lg text-sm font-bold">บันทึก</button>
-                </div>
-            </div>
+        <div class="table-container">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-xs font-bold uppercase text-gray-500 border-b border-gray-100">
+                    <tr>
+                        <th class="p-5 pl-8">โปรเจกต์</th>
+                        <th class="p-5">ลูกค้า</th>
+                        <th class="p-5">สถานะ</th>
+                        <th class="p-5">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y divide-gray-100 text-sm">
+                    <tr><td colspan="4" class="p-10 text-center text-gray-400">Loading...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div id="modal-detail" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <div>
-                    <h3 class="font-bold text-lg" id="d-shop">Shop Name</h3>
-                    <p class="text-xs text-gray-400" id="d-id">ID: ...</p>
-                </div>
-                <button onclick="closeDetail()" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div id="modal-manage" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-xl" id="m-shop">Shop Name</h3>
+                <button onclick="UI.closeModal()" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto space-y-6">
+            <div class="space-y-6">
                 <div>
-                    <label class="text-xs font-bold uppercase text-gray-400 block mb-2">อัปเดตสถานะงาน</label>
-                    <div class="flex gap-2 flex-wrap" id="status-group">
-                        </div>
+                    <label class="text-xs font-bold text-gray-400 uppercase block mb-2">เปลี่ยนสถานะ</label>
+                    <div class="flex flex-wrap gap-2" id="status-btns"></div>
                 </div>
 
-                <div class="bg-gray-900 text-white p-5 rounded-xl">
-                    <div class="flex justify-between items-center mb-3">
-                        <label class="text-xs font-bold uppercase text-gray-400"><i class="fa-solid fa-key"></i> ข้อมูลลับสำหรับลูกค้า</label>
-                        <span class="text-[10px] bg-gray-800 px-2 py-1 rounded">ลูกค้าจะเห็นข้อมูลนี้</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="d-admin-email" class="bg-gray-800 border border-gray-700 text-white p-2 rounded text-sm" placeholder="Username / Login URL">
-                        <input id="d-admin-pass" class="bg-gray-800 border border-gray-700 text-white p-2 rounded text-sm" placeholder="Password">
-                    </div>
-                    <button onclick="saveSecret()" class="mt-3 w-full bg-green-600 hover:bg-green-700 py-2 rounded text-xs font-bold uppercase">บันทึกข้อมูลลับ</button>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <label class="text-xs font-bold text-gray-400 uppercase block mb-3"><i class="fa-solid fa-key"></i> ข้อมูลเข้าใช้งาน (ส่งให้ลูกค้า)</label>
+                    <input id="m-user" class="w-full p-2 border rounded mb-2 text-sm" placeholder="Username / Email">
+                    <input id="m-pass" class="w-full p-2 border rounded mb-2 text-sm" placeholder="Password">
+                    <button onclick="AdminLogic.saveSecret()" class="w-full bg-black text-white py-2 rounded text-xs font-bold uppercase hover:opacity-80">บันทึกข้อมูลลับ</button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <span class="text-gray-400 block text-xs">ลูกค้า</span>
-                        <div class="font-bold" id="d-customer">...</div>
-                    </div>
-                    <div>
-                        <span class="text-gray-400 block text-xs">ประเภท</span>
-                        <div class="font-bold" id="d-type">...</div>
-                    </div>
-                    <div class="col-span-2">
-                        <span class="text-gray-400 block text-xs">รายละเอียด</span>
-                        <div class="bg-gray-50 p-3 rounded border border-gray-100 mt-1" id="d-desc">...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 border-t border-gray-100 flex justify-between bg-gray-50">
-                <button onclick="deleteOrder()" class="text-red-500 text-xs font-bold hover:underline"><i class="fa-solid fa-trash"></i> ลบคำสั่งซื้อนี้</button>
-                <button onclick="closeDetail()" class="bg-gray-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-300">ปิดหน้าต่าง</button>
+                <button onclick="AdminLogic.deleteOrder()" class="text-red-500 text-xs font-bold hover:underline">ลบคำสั่งซื้อนี้</button>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div id="modal-annc" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="font-bold text-xl mb-4">ประกาศหน้าเว็บ</h3>
+            <input id="annc-title" class="w-full p-3 border rounded-lg mb-3" placeholder="หัวข้อประกาศ">
+            <textarea id="annc-msg" class="w-full p-3 border rounded-lg h-24 mb-3 resize-none" placeholder="รายละเอียด..."></textarea>
+            <div class="flex items-center gap-2 mb-6">
+                <input type="checkbox" id="annc-active"> <label for="annc-active" class="text-sm">แสดงผลทันที</label>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="UI.toggleAnncModal()" class="flex-1 py-3 bg-gray-100 rounded-lg font-bold">ปิด</button>
+                <button onclick="AdminLogic.saveAnnc()" class="flex-1 py-3 bg-black text-white rounded-lg font-bold">บันทึก</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // CONFIG
         const firebaseConfig = {
-             apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
-             authDomain: "rsdm-9ca2a.firebaseapp.com",
-             projectId: "rsdm-9ca2a",
-             storageBucket: "rsdm-9ca2a.firebasestorage.app",
-             messagingSenderId: "299212700124",
-             appId: "1:299212700124:web:730160dae6bb1b09cbb719"
+            apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
+            authDomain: "rsdm-9ca2a.firebaseapp.com",
+            projectId: "rsdm-9ca2a",
+            storageBucket: "rsdm-9ca2a.firebasestorage.app",
+            messagingSenderId: "299212700124",
+            appId: "1:299212700124:web:730160dae6bb1b09cbb719"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentId = null;
+
+        // AUTH
+        const AdminAuth = {
+            login: () => {
+                const e = document.getElementById('adm-email').value;
+                const p = document.getElementById('adm-pass').value;
+                firebase.auth().signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+            },
+            logout: () => auth.signOut()
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        let currentOrderId = null;
-        let allOrders = []; // For filtering
-
-        // Auth Logic
-        onAuthStateChanged(auth, user => {
+        auth.onAuthStateChanged(user => {
             if(user && user.email === 'faris@gmail.com') {
                 document.getElementById('login-overlay').classList.add('hidden');
-                startDataStream();
+                AdminLogic.loadData();
             } else {
                 document.getElementById('login-overlay').classList.remove('hidden');
             }
         });
 
-        window.login = () => {
-            const e = document.getElementById('adm-email').value;
-            const p = document.getElementById('adm-pass').value;
-            signInWithEmailAndPassword(auth, e, p).catch(err => alert('Access Denied: ' + err.message));
+        // UI & LOGIC
+        const UI = {
+            openManager: (id, shop, status, u, p) => {
+                currentId = id;
+                document.getElementById('modal-manage').style.display = 'flex';
+                document.getElementById('m-shop').innerText = shop;
+                document.getElementById('m-user').value = u || '';
+                document.getElementById('m-pass').value = p || '';
+                
+                // Gen Status Buttons
+                const statuses = ['pending', 'working', 'testing', 'completed', 'cancelled'];
+                const container = document.getElementById('status-btns');
+                container.innerHTML = statuses.map(s => 
+                    `<button onclick="AdminLogic.setStatus('${s}')" class="btn-status ${status === s ? 'active' : ''}">${s}</button>`
+                ).join('');
+            },
+            closeModal: () => {
+                document.getElementById('modal-manage').style.display = 'none';
+                currentId = null;
+            },
+            toggleAnncModal: () => {
+                const el = document.getElementById('modal-annc');
+                el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+            }
         };
-        window.logout = () => signOut(auth);
 
-        // Data Stream
-        function startDataStream() {
-            onSnapshot(query(collection(db, 'web_orders'), orderBy('timestamp', 'desc')), snap => {
-                const tbody = document.getElementById('table-body');
-                allOrders = [];
-                let p=0, w=0, d=0;
+        const AdminLogic = {
+            loadData: () => {
+                db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                    const tbody = document.getElementById('table-body');
+                    let p=0, a=0, d=0;
 
-                if(snap.empty) { tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">ยังไม่มีคำสั่งซื้อ</td></tr>`; return; }
+                    if(snap.empty) { tbody.innerHTML = `<tr><td colspan="4" class="p-10 text-center">ไม่มีข้อมูล</td></tr>`; return; }
+                    
+                    tbody.innerHTML = snap.docs.map(doc => {
+                        const data = doc.data();
+                        
+                        // Count Stats
+                        if(data.status === 'pending') p++;
+                        if(['working','testing'].includes(data.status)) a++;
+                        if(data.status === 'completed') d++;
 
-                tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    allOrders.push({id: doc.id, ...data});
+                        // Color
+                        let color = 'bg-gray-100 text-gray-500';
+                        if(data.status === 'working') color = 'bg-blue-100 text-blue-600';
+                        if(data.status === 'completed') color = 'bg-green-100 text-green-600';
+                        if(data.status === 'cancelled') color = 'bg-red-100 text-red-600';
 
-                    if(data.status === 'pending') p++;
-                    if(['working', 'testing'].includes(data.status)) w++;
-                    if(data.status === 'completed') d++;
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-5 pl-8 font-bold">${data.shopName}</td>
+                                <td class="p-5 text-gray-500">${data.customerName}<br><span class="text-xs text-gray-300">${data.uid.slice(0,5)}...</span></td>
+                                <td class="p-5"><span class="px-3 py-1 rounded text-xs font-bold uppercase ${color}">${data.status}</span></td>
+                                <td class="p-5">
+                                    <button onclick="UI.openManager('${doc.id}', '${data.shopName}', '${data.status}', '${data.adminEmail||''}', '${data.adminPass||''}')" class="bg-black text-white px-4 py-2 rounded font-bold text-xs hover:opacity-80">จัดการ</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
 
-                    const tr = document.createElement('tr');
-                    tr.className = 'table-row';
-                    tr.innerHTML = `
-                        <td class="p-4 pl-6 font-bold">${data.shopName}</td>
-                        <td class="p-4 text-gray-500">${data.customerName}<div class="text-[10px] text-gray-400">${data.uid.substring(0,6)}...</div></td>
-                        <td class="p-4 text-gray-400 text-xs">${new Date(data.timestamp?.toDate()).toLocaleDateString('th-TH')}</td>
-                        <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase border ${getStatusColor(data.status)}">${data.status}</span></td>
-                        <td class="p-4">
-                            <button onclick="openDetail('${doc.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs font-bold hover:opacity-80">จัดการ</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                    document.getElementById('count-pending').innerText = p;
+                    document.getElementById('count-active').innerText = a;
+                    document.getElementById('count-done').innerText = d;
+                    document.getElementById('count-total').innerText = snap.size;
                 });
-
-                document.getElementById('stat-pending').innerText = p;
-                document.getElementById('stat-working').innerText = w;
-                document.getElementById('stat-done').innerText = d;
-                document.getElementById('stat-total').innerText = allOrders.length;
-            });
-        }
-
-        function getStatusColor(s) {
-            if(s==='pending') return 'bg-yellow-50 text-yellow-600 border-yellow-200';
-            if(s==='completed') return 'bg-green-50 text-green-600 border-green-200';
-            if(s==='cancelled') return 'bg-red-50 text-red-600 border-red-200';
-            return 'bg-blue-50 text-blue-600 border-blue-200';
-        }
-
-        // Modal Logic
-        window.openDetail = (id) => {
-            const o = allOrders.find(x => x.id === id);
-            if(!o) return;
-            currentOrderId = id;
-            
-            document.getElementById('d-shop').innerText = o.shopName;
-            document.getElementById('d-id').innerText = 'Order ID: ' + id;
-            document.getElementById('d-customer').innerText = o.customerName;
-            document.getElementById('d-type').innerText = o.type || '-';
-            document.getElementById('d-desc').innerText = o.description || '-';
-            
-            document.getElementById('d-admin-email').value = o.adminEmail || '';
-            document.getElementById('d-admin-pass').value = o.adminPass || '';
-
-            // Render Status Buttons
-            const statuses = ['pending', 'working', 'testing', 'completed', 'cancelled'];
-            const btnContainer = document.getElementById('status-group');
-            btnContainer.innerHTML = statuses.map(s => 
-                `<button onclick="updateStatus('${s}')" class="btn-status flex-1 py-2 ${o.status === s ? 'active' : ''}">${s}</button>`
-            ).join('');
-
-            document.getElementById('modal-detail').classList.add('show');
-        };
-
-        window.closeDetail = () => {
-            document.getElementById('modal-detail').classList.remove('show');
-            currentOrderId = null;
-        };
-
-        window.updateStatus = async (status) => {
-            if(!currentOrderId) return;
-            await updateDoc(doc(db, 'web_orders', currentOrderId), { status: status });
-            // Re-render buttons immediately for UX
-            openDetail(currentOrderId); 
-        };
-
-        window.saveSecret = async () => {
-            if(!currentOrderId) return;
-            const e = document.getElementById('d-admin-email').value;
-            const p = document.getElementById('d-admin-pass').value;
-            await updateDoc(doc(db, 'web_orders', currentOrderId), { adminEmail: e, adminPass: p });
-            alert('บันทึกข้อมูลลับเรียบร้อย');
-        };
-
-        window.deleteOrder = async () => {
-            if(confirm('ยืนยันการลบคำสั่งซื้อนี้ถาวร?')) {
-                await deleteDoc(doc(db, 'web_orders', currentOrderId));
-                closeDetail();
-            }
-        };
-
-        // Filter Logic
-        window.filterTable = () => {
-            const txt = document.getElementById('search-box').value.toLowerCase();
-            const rows = document.getElementById('table-body').getElementsByTagName('tr');
-            for(let row of rows) {
-                const shopName = row.getElementsByTagName('td')[0]?.innerText.toLowerCase();
-                if(shopName) {
-                    row.style.display = shopName.includes(txt) ? '' : 'none';
+            },
+            setStatus: async (s) => {
+                if(!currentId) return;
+                await db.collection('web_orders').doc(currentId).update({ status: s });
+                // Refresh modal UI manually simply by re-opening or just leave it open to see update in background
+                UI.closeModal(); // Close to show list update
+            },
+            saveSecret: async () => {
+                if(!currentId) return;
+                const u = document.getElementById('m-user').value;
+                const p = document.getElementById('m-pass').value;
+                await db.collection('web_orders').doc(currentId).update({ adminEmail: u, adminPass: p });
+                alert('Saved!');
+            },
+            deleteOrder: async () => {
+                if(confirm('Delete this order?')) {
+                    await db.collection('web_orders').doc(currentId).delete();
+                    UI.closeModal();
                 }
+            },
+            saveAnnc: async () => {
+                const t = document.getElementById('annc-title').value;
+                const m = document.getElementById('annc-msg').value;
+                const a = document.getElementById('annc-active').checked;
+                await db.collection('system_announcements').doc('main').set({
+                    title: t, message: m, isActive: a
+                });
+                alert('Updated Announcement');
+                UI.toggleAnncModal();
             }
-        };
-
-        // Announcement
-        window.toggleAnncModal = () => {
-            const m = document.getElementById('modal-annc');
-            m.classList.toggle('show');
-        };
-        window.saveAnnc = async () => {
-            const t = document.getElementById('annc-title').value;
-            const m = document.getElementById('annc-msg').value;
-            const a = document.getElementById('annc-active').checked;
-            
-            await setDoc(doc(db, 'system_announcements', 'main'), {
-                title: t, message: m, isActive: a, updatedAt: serverTimestamp()
-            });
-            toggleAnncModal();
-            alert('อัปเดตประกาศแล้ว');
         };
     </script>
 </body>
