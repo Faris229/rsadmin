@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Admin - จัดการออเดอร์</title>
+    <title>Q-Store Admin - จัดการออเดอร์</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,84 +15,50 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; }
-        
-        /* Sidebar */
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; color: #1e293b; }
         .sidebar { width: 260px; height: 100vh; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 50; }
-        .nav-item { 
-            display: flex; align-items: center; gap: 12px; padding: 12px 20px; 
-            margin: 4px 12px; border-radius: 10px; cursor: pointer; 
-            color: #64748b; font-weight: 500; transition: all 0.2s; 
-        }
-        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
-        .nav-item.active { background: #eff6ff; color: #2563eb; font-weight: 700; }
-        
-        /* Badge */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; margin: 4px 12px; border-radius: 10px; cursor: pointer; color: #64748b; font-weight: 500; transition: 0.2s; }
+        .nav-item.active { background: #2563eb; color: white; }
         .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-left: auto; color: white; font-weight: bold; }
-        
-        /* Card */
-        .order-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; transition: 0.2s; position: relative; overflow: hidden; }
-        .order-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+        .order-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
         .card-status-line { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
     </style>
 </head>
-<body class="flex">
+<body class="flex h-screen">
 
     <aside class="sidebar shadow-xl">
         <div class="h-20 flex items-center px-6 border-b border-gray-100">
-            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-cube"></i></div>
-                Q-Store Admin
-            </h1>
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-cube text-blue-600"></i> Q-Store Admin</h1>
         </div>
         
-        <nav class="flex-1 py-6 space-y-1">
-            <div onclick="App.setTab('pending')" id="tab-pending" class="nav-item active">
-                <i class="fa-solid fa-inbox w-5"></i> คำสั่งซื้อใหม่ 
-                <span id="badge-pending" class="badge bg-red-500 hidden">0</span>
-            </div>
-            <div onclick="App.setTab('working')" id="tab-working" class="nav-item">
-                <i class="fa-solid fa-hammer w-5"></i> กำลังดำเนินการ
-                <span id="badge-working" class="badge bg-blue-500 hidden">0</span>
-            </div>
-            <div onclick="App.setTab('completed')" id="tab-completed" class="nav-item">
-                <i class="fa-solid fa-check-circle w-5"></i> เสร็จสิ้น
-            </div>
+        <nav class="flex-1 p-4 space-y-1">
+            <div onclick="App.setTab('pending')" id="tab-pending" class="nav-item active"><i class="fa-solid fa-inbox w-5"></i> คำสั่งซื้อใหม่ <span id="badge-pending" class="badge bg-red-500 hidden">0</span></div>
+            <div onclick="App.setTab('working')" id="tab-working" class="nav-item"><i class="fa-solid fa-hammer w-5"></i> กำลังดำเนินการ <span id="badge-working" class="badge bg-blue-500 hidden">0</span></div>
+            <div onclick="App.setTab('completed')" id="tab-completed" class="nav-item"><i class="fa-solid fa-check-circle w-5"></i> เสร็จสิ้น</div>
         </nav>
-
         <div class="p-4 border-t border-gray-100">
-            <div class="flex items-center gap-3 mb-4 px-2">
-                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i class="fa-solid fa-user"></i></div>
-                <div class="text-xs overflow-hidden">
-                    <div class="font-bold text-slate-700 truncate">faris@gmail.com</div>
-                    <div class="text-slate-400">Super Admin</div>
-                </div>
-            </div>
-            <button onclick="Auth.logout()" class="w-full py-2 text-sm text-red-500 font-bold bg-red-50 rounded-lg hover:bg-red-100 transition">ออกจากระบบ</button>
+            <button onclick="Auth.logout()" class="w-full py-2 text-sm text-red-500 font-bold bg-red-50 rounded-lg hover:bg-red-100"><i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ</button>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen bg-f8fafc">
+    <main class="flex-1 flex flex-col relative bg-gray-100">
         <header class="h-20 bg-white/80 backdrop-blur border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
             <h2 id="page-title" class="text-2xl font-bold text-slate-800">คำสั่งซื้อใหม่ (New Orders)</h2>
-            <div class="text-sm text-gray-400 font-medium">จัดการงานรับทำเว็บของคุณ</div>
+            <div class="text-sm text-gray-500 font-medium">Super Admin: faris@gmail.com</div>
         </header>
 
-        <div id="content-area" class="flex-1 overflow-y-auto p-8 relative">
-            <div id="loading" class="absolute inset-0 flex items-center justify-center text-slate-400">
-                <div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i><br>กำลังโหลดข้อมูล...</div>
-            </div>
-            <div id="order-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 opacity-0 transition-opacity duration-500"></div>
+        <div id="content-area" class="flex-1 overflow-y-auto p-8">
+            <div id="loading" class="absolute inset-0 flex items-center justify-center text-slate-400"><div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i><br>กำลังโหลดข้อมูล...</div></div>
+            <div id="order-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"></div>
         </div>
     </main>
 
     <div id="login-modal" class="fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center hidden">
         <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center shadow-2xl">
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-lock"></i></div>
             <h2 class="text-xl font-bold mb-6">เข้าสู่ระบบหลังบ้าน</h2>
             <input id="adm-email" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 text-center" value="faris@gmail.com" readonly>
             <input id="adm-pass" type="password" class="w-full p-3 border rounded-xl mb-6 bg-slate-50" placeholder="รหัสผ่านของคุณ">
-            <button onclick="Auth.login()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700">ยืนยัน</button>
+            <button onclick="Auth.login()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700">เข้าสู่ระบบ</button>
         </div>
     </div>
 
@@ -108,121 +74,108 @@
         };
         const SUPER_ADMIN = "faris@gmail.com"; 
 
-        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- 2. TEMPLATES (Safe Script Injection) ---
-        // ใช้ <` + `/script> เพื่อหลีกเลี่ยง bug ที่ทำให้เว็บพัง
+        // --- 2. CODE TEMPLATES (ยัดไส้โค้ด Client/Admin ตัวเต็มเข้าไป) ---
+        // ใช้ \u003Cscript> เพื่อหลีกเลี่ยงการพังของโค้ดเมื่ออยู่ใน string
         
-        const CLIENT_CODE = `<!DOCTYPE html>
+        const TPL_CLIENT = `<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จองคิว - {{SHOP_NAME}}</title>
-    <script src="https://cdn.tailwindcss.com"><` + `/script>
+    <script src="https://cdn.tailwindcss.com">\u003C/script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"><` + `/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"><` + `/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"><` + `/script>
-    <style>body{font-family:'Sarabun',sans-serif;background:#f8fafc}.glass-card{background:rgba(255,255,255,0.98);border-radius:1.5rem;border:1px solid #e2e8f0;box-shadow:0 10px 30px -10px rgba(0,0,0,0.08)}.btn-gradient{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;transition:0.2s}</style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">\u003C/script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">\u003C/script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">\u003C/script>
+    <style>body{font-family:'Sarabun',sans-serif;background-color:#f8fafc}.glass-card{background:rgba(255,255,255,0.98);border-radius:1.5rem;border:1px solid #e2e8f0;box-shadow:0 10px 30px -10px rgba(0,0,0,0.08)}</style>
 </head>
 <body class="min-h-screen flex flex-col pt-16 px-4">
     <header class="mb-6 flex justify-between items-end max-w-md mx-auto w-full">
-        <div><h1 class="font-bold text-2xl text-slate-800 leading-none" id="shop-name">{{SHOP_NAME}}</h1><div class="mt-2 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded inline-block">Online</div></div>
+        <div><h1 class="font-bold text-2xl text-slate-800 leading-none" id="shop-name">{{SHOP_NAME}}</h1><div id="shop-badge" class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-xs font-bold shadow-sm border">Online</div></div>
         <div class="text-right"><div class="text-xs text-slate-400 font-bold uppercase mb-1">คิวปัจจุบัน</div><div class="text-4xl font-black text-slate-800 leading-none" id="current-q">---</div></div>
     </header>
     <main class="flex-1 max-w-md mx-auto w-full flex flex-col justify-start relative">
-        <div id="form-section" class="glass-card p-6">
-            <h3 class="font-bold text-xl text-slate-700 mb-4">รับบัตรคิวใหม่</h3>
-            <form onsubmit="App.book(event)" class="space-y-4">
-                <input id="inp-name" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="ชื่อลูกค้า" required>
-                <input id="inp-phone" type="tel" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="เบอร์โทร">
-                <button class="btn-gradient w-full py-4 rounded-xl font-bold text-lg shadow-lg mt-4">กดรับบัตรคิว</button>
-            </form>
-        </div>
-        <div id="ticket-section" class="hidden glass-card p-8 text-center">
-            <div class="text-xs text-slate-400 uppercase tracking-widest mb-2">หมายเลขคิวของคุณ</div>
-            <div id="my-q-num" class="text-7xl font-black text-slate-800 mb-2">---</div>
-            <div class="text-left text-sm mb-4"><span class="text-slate-400">ชื่อ:</span> <span id="my-name" class="font-bold">...</span></div>
-            <button onclick="App.cancel()" class="text-sm text-red-400 underline">ยกเลิกคิว</button>
-        </div>
+        <div id="form-section" class="glass-card p-6"><h3 class="font-bold text-xl text-slate-700 mb-4">รับบัตรคิวใหม่</h3><form onsubmit="App.book(event)" class="space-y-4"><input id="inp-name" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="ชื่อลูกค้า" required><input id="inp-phone" type="tel" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="เบอร์โทร"><button class="btn-gradient w-full py-4 rounded-xl font-bold text-lg shadow-lg mt-4">กดรับบัตรคิว</button></form></div>
+        <div id="ticket-section" class="hidden glass-card p-8 text-center"><div class="text-7xl font-black text-slate-800" id="my-q-num">---</div></div>
+        <div id="msg-section" class="hidden text-center p-6"><h2 class="text-2xl font-bold">ขอบคุณที่ใช้บริการ</h2></div>
     </main>
     <script>
         const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
         firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
         class CustomerApp {
             constructor(){this.myId=localStorage.getItem('q_id'); this.init();}
-            init(){ if(this.myId) this.listenTicket(); db.collection('q_system').doc('config').onSnapshot(d=>{if(d.exists){document.getElementById('current-q').innerText=d.data().current||'---';}});}
-            listenTicket(){ db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(d=>{
-                if(!d.exists) return localStorage.removeItem('q_id'),location.reload();
-                const dat=d.data();
-                if(dat.status==='served'){ Swal.fire('เสร็จสิ้น','ขอบคุณ','success').then(()=>this.logout()); }
-                else { document.getElementById('form-section').classList.add('hidden'); document.getElementById('ticket-section').classList.remove('hidden'); document.getElementById('my-q-num').innerText=dat.number; document.getElementById('my-name').innerText=dat.name; }
-            });}
-            async book(e){ e.preventDefault(); 
-                await db.runTransaction(async t=>{ const ref=db.collection('q_system').doc('config'); const d=(await t.get(ref)).data(); const next=(d.last||0)+1; const num='A-'+String(next).padStart(3,'0'); const qRef=ref.collection('queues').doc(); t.set(qRef,{number:num, raw:next, name:document.getElementById('inp-name').value, status:'waiting', timestamp:firebase.firestore.FieldValue.serverTimestamp()}); t.update(ref,{last:next}); localStorage.setItem('q_id',qRef.id); this.myId=qRef.id; });
-                this.listenTicket();
-            }
+            init(){ if(this.myId) this.listenTicket(); db.collection('q_system').doc('config').onSnapshot(d=>{ if(d.exists){ document.getElementById('current-q').innerText=d.data().current||'---'; document.getElementById('shop-name').innerText='{{SHOP_NAME}}'; } }); }
+            listenTicket(){ db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(d=>{ const dat=d.data(); if(dat.status==='served') { document.getElementById('ticket-section').classList.add('hidden'); document.getElementById('msg-section').classList.remove('hidden'); } else if(dat.status==='waiting'||dat.status==='called'){ document.getElementById('form-section').classList.add('hidden'); document.getElementById('ticket-section').classList.remove('hidden'); document.getElementById('my-q-num').innerText=dat.number; } else { localStorage.removeItem('q_id'); location.reload(); } }); }
+            async book(e){ e.preventDefault(); await db.runTransaction(async t=>{ const ref=db.collection('q_system').doc('config'); const d=(await t.get(ref)).data(); const next=(d.last||0)+1; const num='A-'+String(next).padStart(3,'0'); const qRef=ref.collection('queues').doc(); t.set(qRef,{number:num, raw:next, name:document.getElementById('inp-name').value, status:'waiting', timestamp:firebase.firestore.FieldValue.serverTimestamp()}); t.update(ref,{last:next}); localStorage.setItem('q_id',qRef.id); this.myId=qRef.id; }); this.listenTicket(); }
             cancel(){ if(confirm('ยกเลิก?')) db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'}); }
             logout(){ localStorage.removeItem('q_id'); location.reload(); }
         }
         const App=new CustomerApp();
-    <` + `/script>
+    \u003C/script>
 </body>
 </html>`;
 
-        const ADMIN_CODE = `<!DOCTYPE html>
+        const TPL_ADMIN = `<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - {{SHOP_NAME}}</title>
-    <script src="https://cdn.tailwindcss.com"><` + `/script>
+    <script src="https://cdn.tailwindcss.com">\u003C/script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"><` + `/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"><` + `/script>
-    <style>body{font-family:'Sarabun',sans-serif;background:#f1f5f9}</style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">\u003C/script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">\u003C/script>
+    <style>body{font-family:'Sarabun',sans-serif;background:#f1f5f9}.btn-action{padding:8px 16px;border-radius:8px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.btn-call{background:#eff6ff;color:#2563eb}.btn-done{background:#ecfdf5;color:#16a34a}</style>
 </head>
 <body class="flex h-screen">
-    <aside class="w-64 bg-white border-r p-6">
-        <h1 class="text-xl font-bold mb-6 text-blue-600">{{SHOP_NAME}}</h1>
-        <div class="bg-blue-50 text-blue-700 p-3 rounded font-bold">จัดการคิว</div>
-        <div class="mt-4 text-xs text-gray-400">ใช้รหัสผ่านด้านบน Login</div>
-    </aside>
+    <aside class="w-64 bg-white border-r p-6"><h1 class="text-xl font-bold mb-6 text-blue-600">{{SHOP_NAME}}</h1><div class="p-3 bg-blue-50 text-blue-700 rounded font-bold">จัดการคิว</div><div class="mt-4 text-xs text-gray-400">ใช้รหัสผ่านด้านบน Login</div></aside>
     <main class="flex-1 p-8 overflow-y-auto">
-        <header class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold">คิวรอเรียก</h2>
-            <div class="text-4xl font-black text-blue-600" id="header-current">---</div>
-        </header>
+        <header class="flex justify-between items-center mb-8"><h2 class="text-2xl font-bold">คิวรอเรียก</h2><div class="text-4xl font-black text-blue-600" id="header-current">---</div></header>
         <div id="tb-live" class="space-y-3">Loading...</div>
     </main>
     <script>
         const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
         firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
-        // ... (Admin Logic) ...
-        db.collection('q_system').doc('config').collection('queues').orderBy('timestamp','asc').onSnapshot(s=>{
-            document.getElementById('tb-live').innerHTML = s.docs.map(d=>{
-                const dat=d.data(); if(!['waiting','called'].includes(dat.status)) return '';
-                return \`<div class="bg-white p-4 rounded shadow flex justify-between items-center"><span class="text-2xl font-bold">\${dat.number}</span><span>\${dat.name}</span><button onclick="db.collection('q_system').doc('config').collection('queues').doc('\${d.id}').update({status:'served'})" class="bg-green-100 text-green-700 px-3 py-1 rounded">จบงาน</button></div>\`;
-            }).join('');
-        });
-    <` + `/script>
+        class AdminApp {
+            constructor(){ this.qRef=db.collection('q_system').doc('config').collection('queues'); this.cRef=db.collection('q_system').doc('config'); this.init(); }
+            init(){ this.cRef.onSnapshot(d=>{ if(d.exists) document.getElementById('header-current').innerText=d.data().current||'---'; }); this.qRef.orderBy('timestamp','asc').onSnapshot(s=>{
+                    const active=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>['waiting','called'].includes(x.status));
+                    document.getElementById('tb-live').innerHTML = active.map(d=>\`
+                        <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center \${d.status==='called'?'border-blue-500 border-l-4':''}">
+                            <div><span class="text-2xl font-black mr-4">\${d.number}</span> <span class="font-bold">\${d.name}</span></div>
+                            <div class="flex gap-2">
+                                <button onclick="window.Admin.call('\${d.id}','\${d.number}','\${d.name}')" class="btn-action btn-call">เรียก</button>
+                                <button onclick="window.Admin.serve('\${d.id}')" class="btn-action btn-done">จบ</button>
+                            </div>
+                        </div>\`).join('') || '<div class="text-center text-gray-400">ไม่มีคิว</div>';
+                });
+            }
+            call(id,n,nm){ this.qRef.doc(id).update({status:'called',lastCallTime:Date.now(),voiceMessage:'เชิญหมายเลข '+n}); this.cRef.update({current:n}); }
+            serve(id){ this.qRef.doc(id).update({status:'served'}); }
+            resetSystem(){ if(confirm('รีเซ็ต?')) { this.cRef.update({current:'---',last:0}); this.qRef.get().then(s=>{const b=db.batch();s.docs.forEach(d=>b.delete(d.ref));b.commit()}); } }
+        }
+        window.onload=()=>window.Admin=new AdminApp();
+    \u003C/script>
 </body>
 </html>`;
 
-        // --- 3. LOGIC ---
+        // --- 4. LOGIC ---
         let orders = [];
         let tab = 'pending';
 
         const Auth = {
             login: () => {
-                const pass = document.getElementById('adm-pass').value;
-                auth.signInWithEmailAndPassword(SUPER_ADMIN, pass).catch(e => Swal.fire('ผิดพลาด', e.message, 'error'));
+                const e = document.getElementById('adm-email').value;
+                const p = document.getElementById('adm-pass').value;
+                auth.signInWithEmailAndPassword(SUPER_ADMIN, p).catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
             },
-            logout: () => auth.signOut()
+            logout: () => auth.signOut().then(() => location.reload())
         };
 
         const App = {
@@ -236,88 +189,73 @@
                     }
                 });
             },
-            
+
             fetchOrders: () => {
                 db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
                     orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.updateUI();
+                    App.updateBadges();
+                    App.renderList();
                     document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('order-grid').classList.remove('opacity-0');
                 });
+            },
+
+            updateBadges: () => {
+                const p = orders.filter(o => o.status === 'pending').length;
+                const w = orders.filter(o => ['working', 'testing'].includes(o.status)).length;
+                const b1 = document.getElementById('badge-pending');
+                const b2 = document.getElementById('badge-working');
+                if(p>0){b1.innerText=p;b1.classList.remove('hidden');}else b1.classList.add('hidden');
+                if(w>0){b2.innerText=w;b2.classList.remove('hidden');}else b2.classList.add('hidden');
             },
 
             setTab: (t) => {
                 tab = t;
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 document.getElementById(`tab-${t}`).classList.add('active');
-                
-                const titles = { 'pending': 'คำสั่งซื้อใหม่ (New)', 'working': 'กำลังดำเนินการ (Working)', 'completed': 'เสร็จสิ้น (Completed)' };
-                document.getElementById('page-title').innerText = titles[t];
-                
-                App.updateUI();
+                document.getElementById('page-title').innerText = t === 'pending' ? 'คำสั่งซื้อใหม่' : (t === 'working' ? 'กำลังดำเนินการ' : 'เสร็จสิ้นแล้ว');
+                App.renderList();
             },
 
-            updateUI: () => {
-                // Update Badges
-                const pCount = orders.filter(o => o.status === 'pending').length;
-                const wCount = orders.filter(o => ['working', 'testing'].includes(o.status)).length;
-                
-                const bp = document.getElementById('badge-pending');
-                const bw = document.getElementById('badge-working');
-                
-                if(pCount > 0) { bp.innerText = pCount; bp.classList.remove('hidden'); } else bp.classList.add('hidden');
-                if(wCount > 0) { bw.innerText = wCount; bw.classList.remove('hidden'); } else bw.classList.add('hidden');
-
-                // Filter & Render Grid
-                const grid = document.getElementById('order-grid');
+            renderList: () => {
+                const container = document.getElementById('order-list');
                 let filtered = [];
-                if(tab === 'pending') filtered = orders.filter(o => o.status === 'pending');
-                else if(tab === 'working') filtered = orders.filter(o => ['working', 'testing'].includes(o.status));
+                if (tab === 'pending') filtered = orders.filter(o => o.status === 'pending');
+                else if (tab === 'working') filtered = orders.filter(o => ['working', 'testing'].includes(o.status));
                 else filtered = orders.filter(o => o.status === 'completed');
 
-                if (filtered.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 bg-white rounded-2xl border border-dashed"><i class="fa-solid fa-box-open text-4xl mb-4"></i><br>ไม่มีออเดอร์ในสถานะนี้</div>`;
-                    return;
-                }
+                if (filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 bg-white rounded-2xl border border-dashed"><i class="fa-solid fa-box-open text-4xl mb-4"></i><br>ไม่มีออเดอร์ในสถานะนี้</div>`; return; }
 
-                grid.innerHTML = filtered.map(o => {
+                container.innerHTML = filtered.map(o => {
                     const dataJson = encodeURIComponent(JSON.stringify(o));
                     
-                    let statusColor = 'bg-gray-100 text-gray-500';
-                    if(o.status==='pending') statusColor='bg-red-100 text-red-600';
-                    if(o.status==='working') statusColor='bg-blue-100 text-blue-600';
-                    if(o.status==='completed') statusColor='bg-green-100 text-green-600';
-
+                    // Button Logic
                     let actions = '';
                     if (tab === 'pending') {
-                        actions = `<button onclick="App.updateStatus('${o.id}','working')" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md">กดรับงาน</button>`;
+                        actions = `<button onclick="App.updateStatus('${o.id}', 'working')" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md"><i class="fa-solid fa-hammer"></i> กดรับงาน (เริ่มทำ)</button>`;
                     } else if (tab === 'working') {
                         actions = `
-                            <div class="grid grid-cols-2 gap-2 mt-2">
-                                <button onclick="App.genCode('${dataJson}')" class="py-2 bg-purple-100 text-purple-700 font-bold rounded-lg border border-purple-200 hover:bg-purple-200">เจนโค้ด</button>
-                                <button onclick="App.updateStatus('${o.id}','completed')" class="py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700">เสร็จสิ้น</button>
+                            <div class="grid grid-cols-2 gap-3 mt-2">
+                                <button onclick="App.generateCode('${dataJson}')" class="py-2 bg-purple-100 text-purple-700 font-bold rounded-lg border border-purple-200 hover:bg-purple-200"><i class="fa-solid fa-code"></i> เจนโค้ด</button>
+                                <button onclick="App.updateStatus('${o.id}', 'completed')" class="py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700"><i class="fa-solid fa-check"></i> เสร็จสิ้น</button>
                             </div>`;
                     } else {
                         actions = `<div class="w-full py-2 bg-green-50 text-green-600 font-bold rounded-lg text-center border border-green-100"><i class="fa-solid fa-check"></i> ส่งมอบแล้ว</div>`;
                     }
 
                     return `
-                        <div class="order-card">
+                        <div class="order-card p-6 flex flex-col h-full">
                             <div class="card-status-line ${o.status==='pending'?'bg-red-500':(o.status==='working'?'bg-blue-500':'bg-green-500')}"></div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="text-xs px-2 py-1 rounded font-bold ${statusColor}">${o.status.toUpperCase()}</span>
-                                <span class="text-xs text-gray-400">${new Date(o.timestamp?.toDate()).toLocaleDateString()}</span>
+                                <h3 class="text-lg font-bold text-gray-800">${o.shopName}</h3>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">${new Date(o.timestamp?.toDate()).toLocaleDateString()}</span>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-800 mb-1">${o.shopName}</h3>
-                            <p class="text-sm text-gray-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-user"></i> ${o.customerName}</p>
-                            
-                            <div class="bg-gray-50 p-3 rounded-lg text-xs text-gray-600 space-y-1 mb-4 border border-gray-100">
-                                <div class="flex justify-between"><span>Admin Email:</span> <span class="font-bold select-all">${o.adminEmail}</span></div>
-                                <div class="flex justify-between"><span>Admin Pass:</span> <span class="font-bold select-all">${o.adminPass}</span></div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm space-y-1 mb-6 flex-1">
+                                <div class="flex justify-between"><span class="text-gray-400">ลูกค้า:</span> <span>${o.customerName}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400">Email Admin:</span> <span class="text-gray-700 select-all">${o.adminEmail}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400">Password:</span> <span class="text-gray-700 select-all">${o.adminPass}</span></div>
                             </div>
-                            ${actions}
-                        </div>
-                    `;
+                            <div class="mt-auto">${actions}</div>
+                        </div>`;
                 }).join('');
             },
 
@@ -325,34 +263,19 @@
                 db.collection('web_orders').doc(id).update({status: val});
             },
 
-            genCode: (json) => {
-                const o = JSON.parse(decodeURIComponent(json));
+            generateCode: (jsonStr) => {
+                const o = JSON.parse(decodeURIComponent(jsonStr));
                 
-                // แทนที่ข้อมูลลูกค้าลงใน Template
-                let c = CLIENT_CODE.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
-                let a = ADMIN_CODE.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{ADM_EMAIL}}/g, o.adminEmail).replace(/{{ADM_PASS}}/g, o.adminPass).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
+                // แทนที่ข้อมูลลูกค้าลงใน Template (ใช้ escape symbol เพื่อป้องกัน code break)
+                let cCode = TPL_CLIENT.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
+                let aCode = TPL_ADMIN.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{ADM_EMAIL}}/g, o.adminEmail).replace(/{{ADM_PASS}}/g, o.adminPass).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
 
                 Swal.fire({
-                    title: `Gen Code: ${o.shopName}`,
-                    width: '800px',
-                    html: `
-                        <div class="text-left space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-blue-600 block mb-1">1. โค้ดลูกค้า (Client)</label>
-                                <div class="relative">
-                                    <textarea id="tc" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" readonly>${c}</textarea>
-                                    <button onclick="navigator.clipboard.writeText(document.getElementById('tc').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-purple-600 block mb-1">2. โค้ดแอดมิน (Admin)</label>
-                                <div class="relative">
-                                    <textarea id="ta" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-purple-500 outline-none" readonly>${a}</textarea>
-                                    <button onclick="navigator.clipboard.writeText(document.getElementById('ta').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button>
-                                </div>
-                            </div>
-                        </div>
-                    `,
+                    title: `Gen Code: ${o.shopName}`, width: '800px',
+                    html: `<div class="text-left space-y-4">
+                            <div><label class="text-xs font-bold text-blue-600 block mb-1">1. โค้ดลูกค้า (client.html)</label><textarea id="tc" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" readonly>${cCode}</textarea><button onclick="navigator.clipboard.writeText(document.getElementById('tc').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button></div>
+                            <div><label class="text-xs font-bold text-purple-600 block mb-1">2. โค้ดแอดมิน (admin.html)</label><textarea id="ta" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-purple-500 outline-none" readonly>${aCode}</textarea><button onclick="navigator.clipboard.writeText(document.getElementById('ta').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button></div>
+                        </div>`,
                     showConfirmButton: false, showCloseButton: true
                 });
             }
