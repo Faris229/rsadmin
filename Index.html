@@ -1,898 +1,189 @@
 <!DOCTYPE html>
-<html lang="th" class="light">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Admin Ultimate | ระบบจัดการหลังบ้าน</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-
+    <title>Admin Control | Minimal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/th.js"></script>
-    <script>dayjs.locale('th');</script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Kanit', 'Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
-                        dark: { bg: '#0f172a', card: '#1e293b', text: '#f1f5f9', border: '#334155' }
-                    },
-                    animation: { 'spin-slow': 'spin 3s linear infinite' }
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer components {
-            /* Base Layout */
-            body { @apply bg-slate-50 text-slate-800 dark:bg-dark-bg dark:text-dark-text transition-colors duration-300; }
-            
-            /* Sidebar */
-            .sidebar-container { @apply fixed top-0 left-0 h-full w-[280px] bg-white dark:bg-dark-card border-r border-slate-200 dark:border-dark-border z-50 transition-all duration-300 flex flex-col; }
-            .nav-item { @apply flex items-center gap-3 px-4 py-3 m-2 rounded-xl text-slate-500 dark:text-slate-400 font-medium cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-slate-800/50; }
-            .nav-item.active { @apply bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-500 font-semibold shadow-sm; }
-            .nav-item i { @apply text-lg w-6 text-center; }
-
-            /* Cards & Containers */
-            .card-panel { @apply bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl shadow-sm p-6 transition-all; }
-            .hover-card { @apply hover:shadow-md hover:-translate-y-1 transition-all duration-300; }
-
-            /* Inputs & Buttons */
-            .input-field { @apply w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-dark-border rounded-xl outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all; }
-            .btn-primary { @apply bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-brand-500/30 active:scale-95 transition-all flex items-center justify-center gap-2; }
-            .btn-danger { @apply bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow-sm active:scale-95 transition-all; }
-
-            /* Status Badges & Lines */
-            .status-badge { @apply text-[10px] uppercase font-bold px-2 py-1 rounded-full tracking-wider; }
-            .st-pending { @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
-            .st-working { @apply bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400; }
-            .st-testing { @apply bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400; }
-            .st-completed { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
-            .st-cancelled { @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400; }
-            .card-border-line { @apply absolute left-0 top-0 bottom-0 w-[4px]; }
-            .bl-pending { @apply bg-yellow-500; } .bl-working { @apply bg-blue-500; } .bl-testing { @apply bg-purple-500; } .bl-completed { @apply bg-green-500; } .bl-cancelled { @apply bg-red-500; }
-
-            /* Utilities */
-            .glass-effect { @apply bg-white/80 dark:bg-dark-card/80 backdrop-blur-md; }
-            .loading-skeleton { @apply animate-pulse bg-slate-200 dark:bg-slate-700 rounded; }
-
-            /* Toast Notification */
-            #toast-container { @apply fixed top-4 right-4 z-[100] flex flex-col gap-3 pointer-events-none; }
-            .toast-box { @apply pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg bg-white dark:bg-dark-card border-l-4 animate__animated animate__fadeInRight animate__faster; }
-            .toast-success { @apply border-green-500; } .toast-error { @apply border-red-500; } .toast-info { @apply border-blue-500; }
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f9fafb; color: #111; }
+        .card { background: white; border: 1px solid #f3f4f6; padding: 20px; border-radius: 12px; }
+        .btn-act { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #e5e7eb; background: white; transition: 0.1s; }
+        .btn-act:hover { background: #f3f4f6; border-color: #d1d5db; }
+        .btn-act.active { background: #000; color: white; border-color: #000; }
+        .input-mini { background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; border-radius: 6px; width: 100%; font-size: 13px; outline: none; }
+        .input-mini:focus { background: #fff; border-color: #000; }
     </style>
 </head>
-<body class="overflow-hidden h-screen flex">
+<body class="flex min-h-screen">
 
-    <div id="toast-container"></div>
-
-    <div id="login-overlay" class="fixed inset-0 bg-slate-900 dark:bg-black z-[999] flex items-center justify-center animate__animated animate__fadeIn">
-        <div class="bg-white dark:bg-dark-card p-10 rounded-3xl w-full max-w-md text-center shadow-2xl border border-slate-200 dark:border-dark-border relative overflow-hidden">
-             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 to-purple-600"></div>
-            <div class="mb-6 inline-block p-4 bg-brand-100 dark:bg-brand-900/30 rounded-full text-brand-600 dark:text-brand-400 text-3xl shadow-sm">
-                <i class="fa-solid fa-shield-cat animate-pulse"></i>
-            </div>
-            <h2 class="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-purple-600">Admin Access Area</h2>
-            <p class="text-slate-500 dark:text-slate-400 mb-8 text-sm">พื้นที่สำหรับผู้ดูแลระบบสูงสุดเท่านั้น</p>
-            
-            <div class="space-y-4">
-                <div class="relative">
-                    <i class="fa-solid fa-envelope absolute top-4 left-4 text-slate-400"></i>
-                    <input id="login-email" class="input-field pl-12 text-center font-medium" value="faris@gmail.com" readonly>
-                </div>
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute top-4 left-4 text-slate-400"></i>
-                    <input id="login-pass" type="password" class="input-field pl-12 text-center" placeholder="ป้อนรหัสผ่านความปลอดภัย">
-                </div>
-                <button onclick="Auth.login()" class="btn-primary w-full py-4 text-lg relative overflow-hidden group">
-                    <span class="relative z-10">เข้าสู่ระบบ Console</span>
-                    <div class="absolute inset-0 bg-gradient-to-r from-brand-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </button>
-            </div>
-             <p class="mt-6 text-xs text-slate-400">Secure System v2.5.1 | Powered by Firebase 9</p>
+    <div id="admin-login" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="w-64 text-center">
+            <h2 class="text-xl font-bold mb-4">Admin Access</h2>
+            <input id="adm-email" value="faris@gmail.com" class="input-mini mb-2 text-center" placeholder="Email">
+            <input id="adm-pass" type="password" class="input-mini mb-4 text-center" placeholder="Password">
+            <button id="btn-adm-login" class="w-full bg-black text-white py-2 rounded-lg text-sm">Unlock</button>
         </div>
     </div>
 
-    <aside class="sidebar-container">
-        <div class="h-20 flex items-center px-6 border-b border-slate-100 dark:border-dark-border">
-            <div class="w-10 h-10 bg-gradient-to-tr from-brand-600 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-brand-500/20 mr-3">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-700 to-purple-700 dark:from-brand-400 dark:to-purple-400">Q-Admin Pro</h1>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Ultimate Edition</p>
-            </div>
-        </div>
-        
-        <nav class="flex-1 overflow-y-auto py-4 space-y-1 px-2 scrollbar-hide">
-            <div class="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Analytics & Overview</div>
-            <div onclick="Router.navigate('dashboard')" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> แดชบอร์ดสรุปผล</div>
-            
-            <div class="mt-6 px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Order Management</div>
-            <div onclick="Router.navigate('orders-pending')" id="nav-orders-pending" class="nav-item relative">
-                <i class="fa-solid fa-inbox"></i> คำสั่งซื้อใหม่ <span id="badge-pending" class="absolute right-3 top-3 w-2 h-2 bg-red-500 rounded-full hidden animate-ping"></span>
-            </div>
-            <div onclick="Router.navigate('orders-process')" id="nav-orders-process" class="nav-item relative">
-                <i class="fa-solid fa-list-check"></i> กำลังดำเนินการ <span id="badge-process" class="absolute right-3 top-3 w-2 h-2 bg-blue-500 rounded-full hidden"></span>
-            </div>
-            <div onclick="Router.navigate('orders-history')" id="nav-orders-history" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติงานทั้งหมด</div>
-
-            <div class="mt-6 px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">System & Users</div>
-             <div onclick="Router.navigate('announcements')" id="nav-announcements" class="nav-item"><i class="fa-solid fa-bullhorn"></i> ระบบประกาศ (News)</div>
-            <div onclick="Router.navigate('users')" id="nav-users" class="nav-item"><i class="fa-solid fa-users-gear"></i> ฐานข้อมูลลูกค้า</div>
+    <aside class="w-64 bg-white border-r border-gray-100 fixed h-full hidden md:block z-10">
+        <div class="p-8 font-bold text-xl tracking-tighter">Admin.</div>
+        <nav class="mt-4 px-4 space-y-1 text-sm font-medium text-gray-500">
+            <a href="#" class="block px-4 py-3 bg-gray-50 text-black rounded-lg">Dashboard</a>
+            <a href="#" onclick="alert('Coming soon')" class="block px-4 py-3 hover:bg-gray-50 rounded-lg">Customers</a>
         </nav>
-
-        <div class="p-4 border-t border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-dark-card/50">
-             <div class="flex items-center justify-between mb-4">
-                 <button onclick="Theme.toggle()" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-dark-border flex items-center justify-center text-slate-500 dark:text-yellow-400 hover:shadow-sm transition-all">
-                    <i id="theme-icon" class="fa-solid fa-moon"></i>
-                </button>
-                 <div class="text-right">
-                    <div class="text-sm font-bold truncate w-32">faris@gmail.com</div>
-                    <div class="text-[10px] text-brand-500 font-bold uppercase">Super Admin Online</div>
-                 </div>
-            </div>
-            <button onclick="Auth.logout()" class="w-full py-3 text-sm text-red-500 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-right-from-bracket"></i> ลงชื่อออก
-            </button>
+        <div class="absolute bottom-8 left-8">
+            <button id="btn-adm-logout" class="text-xs text-red-500 hover:underline">Log Out</button>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col ml-[280px] bg-slate-100 dark:bg-dark-bg transition-all duration-300">
-        <header class="h-20 glass-effect border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-8 sticky top-0 z-40">
-            <div>
-                <h2 id="page-title" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-400">
-                    Dashboard Overview
-                </h2>
-                <p id="page-subtitle" class="text-xs text-slate-500 dark:text-slate-400 font-medium">ยินดีต้อนรับกลับสู่แผงควบคุมหลัก</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-dark-card px-4 py-2 rounded-full border border-slate-200 dark:border-dark-border shadow-sm">
-                    <i class="fa-solid fa-clock text-brand-500"></i>
-                    <span id="current-time">Loading time...</span>
-                </div>
-                <button onclick="App.refreshData()" class="w-10 h-10 rounded-full bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-500 flex items-center justify-center hover:text-brand-500 hover:rotate-180 transition-all duration-500 shadow-sm">
-                    <i class="fa-solid fa-sync-alt"></i>
-                </button>
-            </div>
+    <main class="flex-1 md:ml-64 p-8">
+        <header class="flex justify-between items-center mb-10">
+            <h1 class="text-2xl font-bold">Overview</h1>
+            <div id="status-indicator" class="w-3 h-3 bg-red-500 rounded-full"></div>
         </header>
 
-        <div id="content-body" class="flex-1 overflow-y-auto p-8 relative scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
-            <div id="global-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100/50 dark:bg-dark-bg/50 backdrop-blur-sm z-50">
-                <div class="relative w-24 h-24">
-                    <div class="absolute top-0 left-0 w-full h-full border-4 border-slate-200 dark:border-slate-700 rounded-full"></div>
-                    <div class="absolute top-0 left-0 w-full h-full border-4 border-t-brand-500 border-r-purple-500 border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                    <i class="fa-solid fa-bolt absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-slate-400"></i>
-                </div>
-                <p class="mt-4 font-bold text-slate-600 dark:text-slate-300 animate-pulse">กำลังเชื่อมต่อฐานข้อมูล...</p>
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="card">
+                <div class="text-gray-400 text-xs uppercase font-bold">Pending</div>
+                <div id="count-pending" class="text-3xl font-bold mt-2">-</div>
             </div>
+            <div class="card">
+                <div class="text-gray-400 text-xs uppercase font-bold">Working</div>
+                <div id="count-working" class="text-3xl font-bold mt-2">-</div>
             </div>
+            <div class="card">
+                <div class="text-gray-400 text-xs uppercase font-bold">Done</div>
+                <div id="count-completed" class="text-3xl font-bold mt-2">-</div>
+            </div>
+            <div class="card cursor-pointer hover:border-black" onclick="toggleAnnc()">
+                <div class="text-gray-400 text-xs uppercase font-bold flex items-center gap-2"><i class="fa-solid fa-bullhorn"></i> Announcement</div>
+                <div class="text-xs mt-3 text-gray-500">Click to manage</div>
+            </div>
+        </div>
+
+        <div class="space-y-4" id="admin-orders">
+            <div class="text-center text-gray-400 py-10">Waiting for data stream...</div>
+        </div>
     </main>
 
-
-    <div id="order-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-50 flex items-center justify-center hidden backdrop-blur-sm p-4 animate__animated animate__fadeIn animate__faster">
-        <div class="bg-white dark:bg-dark-card w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="px-8 py-5 border-b border-slate-100 dark:border-dark-border flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-2xl shadow-sm">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-xl text-slate-800 dark:text-white" id="modal-shopname">Shop Name</h3>
-                         <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                            <i class="fa-regular fa-calendar"></i> สั่งเมื่อ: <span id="modal-date">Date</span>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="Modal.close('order-modal')" class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-dark-border text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center justify-center transition hover:rotate-90">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+    <div id="annc-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-xl w-96">
+            <h3 class="font-bold mb-4">Set Announcement</h3>
+            <input id="inp-annc-title" class="input-mini mb-2" placeholder="Title">
+            <textarea id="inp-annc-msg" class="input-mini mb-2 h-20 resize-none" placeholder="Message"></textarea>
+            <div class="flex gap-2 items-center mb-4">
+                <input type="checkbox" id="inp-annc-active"> <label for="inp-annc-active" class="text-sm">Active</label>
             </div>
-
-            <div class="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-thin">
-                 <div class="card-panel bg-slate-50/50 dark:bg-slate-800/20 border-dashed">
-                    <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2 uppercase tracking-wider">
-                        <i class="fa-solid fa-diagram-project text-brand-500"></i> Workflow Status Control
-                    </h4>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                         <button onclick="OrderActions.updateStatus('pending')" id="btn-st-pending" class="group p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-yellow-400 transition-all flex flex-col items-center justify-center gap-2 opacity-60 hover:opacity-100">
-                             <i class="fa-solid fa-inbox text-xl text-yellow-500 group-hover:scale-110 transition"></i> <span class="text-xs font-bold">รอรับงาน</span>
-                        </button>
-                         <button onclick="OrderActions.updateStatus('working')" id="btn-st-working" class="group p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 transition-all flex flex-col items-center justify-center gap-2 opacity-60 hover:opacity-100">
-                             <i class="fa-solid fa-hammer text-xl text-blue-500 group-hover:scale-110 transition"></i> <span class="text-xs font-bold">กำลังทำ</span>
-                        </button>
-                         <button onclick="OrderActions.updateStatus('testing')" id="btn-st-testing" class="group p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-purple-400 transition-all flex flex-col items-center justify-center gap-2 opacity-60 hover:opacity-100">
-                             <i class="fa-solid fa-vial-circle-check text-xl text-purple-500 group-hover:scale-110 transition"></i> <span class="text-xs font-bold">ตรวจสอบ (QC)</span>
-                        </button>
-                         <button onclick="OrderActions.updateStatus('completed')" id="btn-st-completed" class="group p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-green-400 transition-all flex flex-col items-center justify-center gap-2 opacity-60 hover:opacity-100">
-                             <i class="fa-solid fa-circle-check text-xl text-green-500 group-hover:scale-110 transition"></i> <span class="text-xs font-bold">เสร็จสิ้น</span>
-                        </button>
-                         <button onclick="OrderActions.updateStatus('cancelled')" id="btn-st-cancelled" class="group p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-red-400 transition-all flex flex-col items-center justify-center gap-2 opacity-60 hover:opacity-100">
-                             <i class="fa-solid fa-ban text-xl text-red-500 group-hover:scale-110 transition"></i> <span class="text-xs font-bold">ยกเลิก</span>
-                        </button>
-                    </div>
-                     <p class="text-xs text-center text-slate-400 mt-3"><i class="fa-solid fa-info-circle"></i> คลิกที่สถานะเพื่ออัปเดตทันที (ลูกค้าจะเห็นการเปลี่ยนแปลงแบบ Real-time)</p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
-                         <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 uppercase tracking-wider">
-                            <i class="fa-solid fa-user-tag text-brand-500"></i> ข้อมูลลูกค้า & ร้านค้า
-                        </h4>
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">ชื่อลูกค้า (Customer Name)</label>
-                            <div class="relative">
-                                <i class="fa-solid fa-user absolute top-4 left-4 text-slate-400"></i>
-                                <input id="modal-customer" class="input-field pl-12 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed" readonly>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                             <div>
-                                <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">Admin Email (ร้าน)</label>
-                                <input id="modal-adm-email" class="input-field font-mono text-sm text-blue-600 dark:text-blue-400">
-                            </div>
-                             <div>
-                                <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">Admin Password</label>
-                                <input id="modal-adm-pass" class="input-field font-mono text-sm text-blue-600 dark:text-blue-400">
-                            </div>
-                        </div>
-                        <button onclick="OrderActions.saveCredentials()" class="btn-primary w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 shadow-none py-2 text-sm">
-                            <i class="fa-solid fa-floppy-disk"></i> บันทึกการแก้ไข Email/Pass
-                        </button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 uppercase tracking-wider">
-                            <i class="fa-solid fa-note-sticky text-yellow-500"></i> บันทึกลับแอดมิน (Internal Notes)
-                        </h4>
-                        <div class="relative">
-                             <textarea id="modal-admin-notes" rows="6" class="input-field resize-none p-4 text-sm scrollbar-thin" placeholder="พิมพ์บันทึกที่นี่ (ลูกค้าจะไม่เห็นข้อความนี้)..."></textarea>
-                             <div class="absolute bottom-4 right-4 text-xs text-slate-400 pointer-events-none"><i class="fa-solid fa-lock"></i> Private</div>
-                        </div>
-                        <button onclick="OrderActions.saveNotes()" class="btn-primary w-full bg-yellow-500 hover:bg-yellow-600 text-white shadow-yellow-500/20 py-2 text-sm">
-                             <i class="fa-solid fa-paste"></i> บันทึกโน้ต
-                        </button>
-                    </div>
-                </div>
-            </div>
-             
-            <div class="px-8 py-5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-dark-border flex justify-between items-center">
-                 <button onclick="OrderActions.deleteOrder()" class="text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-trash-can"></i> ลบออเดอร์ถาวร
-                </button>
-                 <button onclick="Modal.close('order-modal')" class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition">
-                    ปิดหน้าต่าง
-                </button>
-            </div>
+            <button onclick="saveAnnc()" class="w-full bg-black text-white py-2 rounded-lg text-sm">Save</button>
+            <button onclick="toggleAnnc()" class="w-full mt-2 text-gray-400 text-xs hover:text-black">Close</button>
         </div>
     </div>
-
-    <div id="annc-modal" class="fixed inset-0 bg-slate-900/70 dark:bg-black/80 z-50 flex items-center justify-center hidden backdrop-blur-sm animate__animated animate__fadeIn animate__faster">
-        <div class="bg-white dark:bg-dark-card w-full max-w-md rounded-3xl shadow-2xl p-8 border border-slate-200 dark:border-dark-border">
-            <h3 class="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center gap-3">
-                <i class="fa-solid fa-bullhorn text-brand-500"></i> <span id="annc-modal-title">สร้างประกาศใหม่</span>
-            </h3>
-            <input type="hidden" id="annc-id">
-            <div class="space-y-5">
-                 <div>
-                    <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">หัวข้อประกาศ (Title)</label>
-                    <input id="annc-title" class="input-field" placeholder="เช่น แจ้งปิดปรับปรุงระบบ">
-                </div>
-                 <div>
-                    <label class="text-xs font-bold text-slate-400 ml-1 mb-1 block">เนื้อหา (Message)</label>
-                    <textarea id="annc-message" rows="4" class="input-field resize-none" placeholder="รายละเอียด..."></textarea>
-                </div>
-                <div class="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl cursor-pointer" onclick="document.getElementById('annc-active').click()">
-                    <input type="checkbox" id="annc-active" class="w-5 h-5 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
-                    <label for="annc-active" class="font-bold text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">แสดงบนหน้าเว็บลูกค้าทันที (Active)</label>
-                </div>
-                <div class="flex gap-3 pt-4">
-                    <button onclick="Modal.close('annc-modal')" class="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">ยกเลิก</button>
-                    <button onclick="AnncActions.save()" class="flex-1 btn-primary py-3">บันทึกประกาศ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <script type="module">
-        // Import Firebase SDK v9
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- CONFIGURATION ---
         const firebaseConfig = {
-            apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
-            authDomain: "rsdm-9ca2a.firebaseapp.com",
-            projectId: "rsdm-9ca2a",
-            storageBucket: "rsdm-9ca2a.firebasestorage.app",
-            messagingSenderId: "299212700124",
-            appId: "1:299212700124:web:730160dae6bb1b09cbb719"
+             apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
+             authDomain: "rsdm-9ca2a.firebaseapp.com",
+             projectId: "rsdm-9ca2a",
+             storageBucket: "rsdm-9ca2a.firebasestorage.app",
+             messagingSenderId: "299212700124",
+             appId: "1:299212700124:web:730160dae6bb1b09cbb719"
         };
-        const SUPER_ADMIN_EMAIL = "faris@gmail.com";
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global State Variables
-        let allOrders = [];
-        let allAnnouncements = [];
-        let currentView = 'dashboard';
-        let currentOrderId = null;
-        let unsubscribeOrders = null;
-        let unsubscribeAnnc = null;
-
-        // --- HELPER CLASS: Toast Notifications ---
-        class Toast {
-            static show(type, message) {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                const iconMap = {
-                    success: '<i class="fa-solid fa-circle-check text-green-500 text-xl"></i>',
-                    error: '<i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>',
-                    info: '<i class="fa-solid fa-circle-info text-blue-500 text-xl"></i>'
-                };
-                toast.className = `toast-box toast-${type}`;
-                toast.innerHTML = `${iconMap[type]}<div class="font-bold text-sm text-slate-700 dark:text-slate-200">${message}</div>`;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.replace('animate__fadeInRight', 'animate__fadeOutRight');
-                    setTimeout(() => toast.remove(), 500);
-                }, 3000);
+        // --- Logic ---
+        onAuthStateChanged(auth, user => {
+            if(user && user.email === 'faris@gmail.com') {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('status-indicator').classList.replace('bg-red-500', 'bg-green-500');
+                startStream();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
             }
+        });
+
+        document.getElementById('btn-adm-login').onclick = () => {
+            signInWithEmailAndPassword(auth, document.getElementById('adm-email').value, document.getElementById('adm-pass').value)
+            .catch(e => alert('Access Denied: ' + e.message));
+        };
+        document.getElementById('btn-adm-logout').onclick = () => signOut(auth);
+
+        function startStream() {
+            onSnapshot(query(collection(db, 'web_orders'), orderBy('timestamp', 'desc')), snap => {
+                const list = document.getElementById('admin-orders');
+                let p=0, w=0, c=0;
+                
+                if(snap.empty) { list.innerHTML = '<div class="text-center">No orders.</div>'; return; }
+
+                list.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    if(data.status === 'pending') p++;
+                    if(data.status === 'working' || data.status === 'testing') w++;
+                    if(data.status === 'completed') c++;
+
+                    return `
+                    <div class="card flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                        <div>
+                            <div class="font-bold text-lg">${data.shopName}</div>
+                            <div class="text-xs text-gray-400">${data.customerName} • ${new Date(data.timestamp?.toDate()).toLocaleDateString('th-TH')}</div>
+                            <div class="mt-3 flex gap-2">
+                                <input class="input-mini w-32" placeholder="User" value="${data.adminEmail || ''}" id="u-${d.id}">
+                                <input class="input-mini w-32" placeholder="Pass" value="${data.adminPass || ''}" id="p-${d.id}">
+                                <button onclick="window.saveCreds('${d.id}')" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 rounded font-bold"><i class="fa-solid fa-save"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            ${['pending','working','testing','completed','cancelled'].map(s => 
+                                `<button onclick="window.updateStatus('${d.id}', '${s}')" class="btn-act ${data.status === s ? 'active' : ''}">${s}</button>`
+                            ).join('')}
+                            <button onclick="window.delOrder('${d.id}')" class="btn-act text-red-500 hover:bg-red-50"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('count-pending').innerText = p;
+                document.getElementById('count-working').innerText = w;
+                document.getElementById('count-completed').innerText = c;
+            });
         }
 
-        // --- HELPER CLASS: Theme Manager ---
-        class Theme {
-            static init() {
-                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                    document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            }
-            static toggle() {
-                document.documentElement.classList.toggle('dark');
-                const isDark = document.documentElement.classList.contains('dark');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                document.getElementById('theme-icon').classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon');
-            }
-        }
-
-        // --- AUTHENTICATION LOGIC ---
-        window.Auth = {
-            login: async () => {
-                const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-pass').value;
-                if (!pass) return Toast.show('error', 'กรุณากรอกรหัสผ่าน');
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    Toast.show('success', 'เข้าสู่ระบบสำเร็จ');
-                } catch (error) {
-                    Toast.show('error', 'รหัสผ่านไม่ถูกต้อง หรือเกิดข้อผิดพลาด');
-                    console.error("Login Error:", error);
-                }
-            },
-            logout: async () => {
-                Swal.fire({
-                    title: 'ยืนยันการออกจากระบบ?', icon: 'question', showCancelButton: true,
-                    confirmButtonText: 'ออกจากระบบ', cancelButtonText: 'ยกเลิก',
-                    confirmButtonColor: '#ef4444', customClass: { popup: 'dark:bg-dark-card dark:text-white' }
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        if(unsubscribeOrders) unsubscribeOrders();
-                        if(unsubscribeAnnc) unsubscribeAnnc();
-                        await signOut(auth);
-                        window.location.reload();
-                    }
-                });
-            }
+        // Global Actions for HTML calls
+        window.updateStatus = async (id, status) => {
+            await updateDoc(doc(db, 'web_orders', id), { status: status });
+        };
+        window.saveCreds = async (id) => {
+            const e = document.getElementById(`u-${id}`).value;
+            const p = document.getElementById(`p-${id}`).value;
+            await updateDoc(doc(db, 'web_orders', id), { adminEmail: e, adminPass: p });
+            alert('Saved!');
+        };
+        window.delOrder = async (id) => {
+            if(confirm('Delete this order?')) await deleteDoc(doc(db, 'web_orders', id));
         };
 
-        // --- MAIN APP CONTROLLER ---
-        window.App = {
-            init: () => {
-                Theme.init();
-                // Time updater
-                setInterval(() => {
-                    document.getElementById('current-time').innerHTML = dayjs().format('D MMM YYYY | HH:mm:ss');
-                }, 1000);
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user && user.email === SUPER_ADMIN_EMAIL) {
-                        document.getElementById('login-overlay').classList.add('animate__fadeOut');
-                        setTimeout(() => document.getElementById('login-overlay').classList.add('hidden'), 500);
-                        App.startRealtimeListeners();
-                    } else {
-                        document.getElementById('login-overlay').classList.remove('hidden', 'animate__fadeOut');
-                        if (user) signOut(auth); // Force logout if not super admin
-                    }
-                });
-            },
-            startRealtimeListeners: () => {
-                document.getElementById('global-loading').classList.remove('hidden');
-                
-                // Listener 1: Orders
-                const qOrders = query(collection(db, "web_orders"), orderBy("timestamp", "desc"));
-                unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
-                    allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.updateUI();
-                    document.getElementById('global-loading').classList.add('hidden');
-                }, (error) => {
-                    console.error("Orders Listener Error:", error);
-                    Toast.show('error', 'ไม่สามารถโหลดข้อมูลออเดอร์ได้: ' + error.message);
-                    document.getElementById('global-loading').classList.add('hidden');
-                });
-
-                // Listener 2: Announcements
-                const qAnnc = query(collection(db, "system_announcements"), orderBy("updatedAt", "desc"));
-                unsubscribeAnnc = onSnapshot(qAnnc, (snapshot) => {
-                    allAnnouncements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if(currentView === 'announcements') Render.announcements();
-                }, (error) => console.error("Annc Listener Error:", error));
-            },
-            updateUI: () => {
-                // Update Badges
-                const pendingCount = allOrders.filter(o => o.status === 'pending').length;
-                const processCount = allOrders.filter(o => ['working', 'testing'].includes(o.status)).length;
-                const bPending = document.getElementById('badge-pending');
-                const bProcess = document.getElementById('badge-process');
-                
-                if (pendingCount > 0) { bPending.classList.remove('hidden'); } else { bPending.classList.add('hidden'); }
-                if (processCount > 0) { bProcess.classList.remove('hidden'); bProcess.innerText = processCount; } else { bProcess.classList.add('hidden'); }
-
-                // Rerender current view
-                Router.navigate(currentView, true);
-            },
-            refreshData: () => {
-                Toast.show('info', 'กำลังรีเฟรชข้อมูล...');
-                // Snapshot listeners auto-refresh, this just triggers UI rebuild manually if needed
-                App.updateUI();
-            }
-        };
-
-        // --- ROUTER & NAVIGATION ---
-        window.Router = {
-            navigate: (view, isRefresh = false) => {
-                currentView = view;
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                const navId = view.startsWith('orders-') ? `nav-${view}` : `nav-${view.split('-')[0]}`;
-                if (document.getElementById(navId)) document.getElementById(navId).classList.add('active');
-
-                const content = document.getElementById('content-body');
-                const title = document.getElementById('page-title');
-                const subtitle = document.getElementById('page-subtitle');
-
-                if (!isRefresh) content.innerHTML = '<div class="flex justify-center pt-20"><i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-200"></i></div>';
-
-                setTimeout(() => {
-                    switch (view) {
-                        case 'dashboard':
-                            title.innerText = 'Dashboard Overview';
-                            subtitle.innerText = 'ภาพรวมสถิติและกิจกรรมล่าสุดของระบบ';
-                            Render.dashboard(content);
-                            break;
-                        case 'orders-pending':
-                            title.innerText = 'คำสั่งซื้อใหม่ (Pending)';
-                            subtitle.innerText = 'รายการที่รอการตอบรับและเริ่มดำเนินการ';
-                            Render.orderGrid(content, 'pending');
-                            break;
-                        case 'orders-process':
-                            title.innerText = 'กำลังดำเนินการ (In Progress)';
-                            subtitle.innerText = 'รายการที่อยู่ระหว่างการพัฒนาและตรวจสอบ';
-                            Render.orderGrid(content, 'process');
-                            break;
-                        case 'orders-history':
-                            title.innerText = 'ประวัติงานทั้งหมด (History)';
-                            subtitle.innerText = 'รายการที่เสร็จสิ้นหรือถูกยกเลิกไปแล้ว';
-                            Render.orderTable(content);
-                            break;
-                         case 'announcements':
-                            title.innerText = 'ระบบประกาศ (Announcements)';
-                            subtitle.innerText = 'จัดการข่าวสารที่แสดงบนหน้าเว็บลูกค้า';
-                            Render.announcements(content);
-                            break;
-                        case 'users':
-                            title.innerText = 'ฐานข้อมูลลูกค้า (Users DB)';
-                            subtitle.innerText = 'รายชื่อผู้ใช้งานและประวัติการสั่งซื้อ';
-                            Render.usersTable(content);
-                            break;
-                    }
-                }, 200); // Small delay for smooth transition feel
-            }
-        };
-
-        // --- RENDERING ENGINE (The View Layer) ---
-        const Render = {
-            // 1. Dashboard View
-            dashboard: (el) => {
-                const count = (s) => allOrders.filter(o => o.status === s).length;
-                const pending = count('pending');
-                const working = count('working') + count('testing');
-                const completed = count('completed');
-                const total = allOrders.length;
-
-                // Chart.js setup
-                setTimeout(() => {
-                    const ctx = document.getElementById('orderChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['รอรับงาน', 'กำลังทำ/QC', 'เสร็จสิ้น', 'ยกเลิก'],
-                            datasets: [{
-                                data: [pending, working, completed, count('cancelled')],
-                                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'],
-                                borderWidth: 0, hoverOffset: 4
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#475569', font: { family: 'Kanit' } } } }, cutout: '70%' }
-                    });
-                }, 100);
-
-                el.innerHTML = `
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate__animated animate__fadeInUp">
-                        <div class="lg:col-span-2 grid grid-cols-2 gap-6">
-                             <div class="card-panel relative overflow-hidden group">
-                                <div class="card-border-line bl-pending"></div>
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">ออเดอร์ใหม่</div>
-                                        <div class="text-4xl font-black text-slate-800 dark:text-white">${pending}</div>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-inbox"></i></div>
-                                </div>
-                            </div>
-                             <div class="card-panel relative overflow-hidden group">
-                                <div class="card-border-line bl-working"></div>
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">กำลังดำเนินการ</div>
-                                        <div class="text-4xl font-black text-slate-800 dark:text-white">${working}</div>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-hammer"></i></div>
-                                </div>
-                            </div>
-                             <div class="card-panel relative overflow-hidden group">
-                                <div class="card-border-line bl-completed"></div>
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">เสร็จสิ้นแล้ว</div>
-                                        <div class="text-4xl font-black text-slate-800 dark:text-white">${completed}</div>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-circle-check"></i></div>
-                                </div>
-                            </div>
-                             <div class="card-panel relative overflow-hidden group bg-brand-600 text-white dark:bg-brand-900 dark:border-brand-800">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <div class="text-xs font-bold text-brand-200 uppercase tracking-wider mb-1">ยอดรวมทั้งหมด</div>
-                                        <div class="text-4xl font-black">${total}</div>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-xl bg-white/20 text-white flex items-center justify-center text-2xl group-hover:scale-110 transition"><i class="fa-solid fa-chart-simple"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-panel flex flex-col">
-                            <h3 class="font-bold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-brand-500"></i> สัดส่วนสถานะงาน</h3>
-                            <div class="flex-1 relative"><canvas id="orderChart"></canvas></div>
-                        </div>
-                    </div>
-
-                    <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300 mt-10 mb-4 flex items-center gap-2 animate__animated animate__fadeInUp"><i class="fa-solid fa-clock-rotate-left"></i> กิจกรรมล่าสุด</h3>
-                    <div class="card-panel p-0 overflow-hidden animate__animated animate__fadeInUp">
-                        <div class="divide-y divide-slate-100 dark:divide-dark-border">
-                            ${allOrders.slice(0, 5).map(o => `
-                                <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onclick="Modal.openOrder('${o.id}')">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold">${o.shopName.charAt(0)}</div>
-                                        <div>
-                                            <div class="font-bold text-slate-800 dark:text-slate-200">${o.shopName}</div>
-                                            <div class="text-xs text-slate-500 dark:text-slate-500 flex items-center gap-2">
-                                                <i class="fa-solid fa-user-circle"></i> ${o.customerName} 
-                                                <span class="text-slate-300">•</span> 
-                                                ${dayjs(o.timestamp?.toDate()).fromNow()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    ${Render.statusBadge(o.status)}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>`;
-            },
-
-            // 2. Order Grid View (For Pending/Process)
-            orderGrid: (el, type) => {
-                let filtered = [];
-                if (type === 'pending') filtered = allOrders.filter(o => o.status === 'pending');
-                else if (type === 'process') filtered = allOrders.filter(o => ['working', 'testing'].includes(o.status));
-
-                if (filtered.length === 0) return Render.emptyState(el, 'ไม่มีออเดอร์ในสถานะนี้');
-
-                el.innerHTML = `
-                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
-                        ${filtered.map(o => `
-                            <div class="card-panel relative overflow-hidden group hover-card cursor-pointer" onclick="Modal.openOrder('${o.id}')">
-                                <div class="card-border-line bl-${o.status}"></div>
-                                <div class="flex justify-between items-start mb-4 pl-3">
-                                    ${Render.statusBadge(o.status)}
-                                    <span class="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
-                                        ${dayjs(o.timestamp?.toDate()).format('D MMM YYYY')}
-                                    </span>
-                                </div>
-                                <div class="pl-3 mb-6">
-                                    <h3 class="font-bold text-xl text-slate-800 dark:text-white mb-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">${o.shopName}</h3>
-                                    <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2"><i class="fa-solid fa-user-circle"></i> ${o.customerName}</p>
-                                </div>
-                                <div class="pl-3 border-t border-slate-100 dark:border-dark-border pt-4 flex justify-between items-center text-xs">
-                                    <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                                        ${o.adminNotes ? '<i class="fa-solid fa-note-sticky text-yellow-500" title="มีบันทึกลับ"></i>' : ''}
-                                        <span class="truncate w-40 font-mono">${o.adminEmail}</span>
-                                    </div>
-                                    <button class="text-brand-600 dark:text-brand-400 font-bold flex items-center gap-1 group-hover:gap-2 transition-all">จัดการ <i class="fa-solid fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-            },
-
-            // 3. Order Table View (For History)
-            orderTable: (el) => {
-                const filtered = allOrders.filter(o => ['completed', 'cancelled'].includes(o.status));
-                if (filtered.length === 0) return Render.emptyState(el, 'ยังไม่มีประวัติงานที่เสร็จสิ้น');
-
-                el.innerHTML = `
-                    <div class="card-panel p-0 overflow-hidden animate__animated animate__fadeInUp">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800/50 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-dark-border">
-                                <tr>
-                                    <th class="p-4 pl-6">วันที่สั่ง</th>
-                                    <th class="p-4">ร้านค้า & ลูกค้า</th>
-                                    <th class="p-4 text-center">สถานะสุดท้าย</th>
-                                    <th class="p-4 text-right pr-6">เครื่องมือ</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 dark:divide-dark-border text-sm">
-                                ${filtered.map(o => `
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
-                                        <td class="p-4 pl-6 font-mono text-slate-500 dark:text-slate-400">${dayjs(o.timestamp?.toDate()).format('DD/MM/YYYY HH:mm')}</td>
-                                        <td class="p-4">
-                                            <div class="font-bold text-slate-800 dark:text-slate-200">${o.shopName}</div>
-                                            <div class="text-xs text-slate-500 dark:text-slate-500 flex items-center gap-1"><i class="fa-solid fa-user-circle"></i> ${o.customerName}</div>
-                                        </td>
-                                        <td class="p-4 text-center">${Render.statusBadge(o.status)}</td>
-                                        <td class="p-4 text-right pr-6">
-                                            <button onclick="Modal.openOrder('${o.id}')" class="text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-3 py-1 rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-dark-border transition"><i class="fa-solid fa-up-right-from-square"></i> ดูข้อมูล</button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>`;
-            },
+        // Announcement Logic
+        window.toggleAnnc = () => document.getElementById('annc-modal').classList.toggle('hidden');
+        window.saveAnnc = async () => {
+            const title = document.getElementById('inp-annc-title').value;
+            const msg = document.getElementById('inp-annc-msg').value;
+            const active = document.getElementById('inp-annc-active').checked;
             
-            // 4. Announcements View
-            announcements: (el) => {
-                if(!el) el = document.getElementById('content-body');
-                 el.innerHTML = `
-                    <div class="flex justify-between items-center mb-6 animate__animated animate__fadeInDown">
-                        <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300 flex items-center gap-2"><i class="fa-solid fa-bullhorn"></i> รายการประกาศทั้งหมด</h3>
-                        <button onclick="Modal.openAnnc()" class="btn-primary py-2 px-4 text-sm"><i class="fa-solid fa-plus"></i> สร้างประกาศใหม่</button>
-                    </div>
-                    ${allAnnouncements.length === 0 ? Render.emptyState(null, 'ยังไม่มีประกาศ') : 
-                    `<div class="space-y-4 animate__animated animate__fadeInUp">
-                        ${allAnnouncements.map(a => `
-                            <div class="card-panel p-5 flex justify-between items-center ${a.isActive ? 'border-l-4 border-l-green-500' : 'opacity-75'}">
-                                <div>
-                                    <div class="flex items-center gap-3 mb-1">
-                                        ${a.isActive ? '<span class="status-badge bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">ใช้งานอยู่</span>' : '<span class="status-badge bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">ปิดใช้งาน</span>'}
-                                        <h4 class="font-bold text-lg text-slate-800 dark:text-white">${a.title}</h4>
-                                    </div>
-                                    <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">${a.message}</p>
-                                    <div class="text-xs text-slate-400 mt-2">อัปเดตล่าสุด: ${dayjs(a.updatedAt?.toDate()).fromNow()}</div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button onclick="Modal.openAnnc('${a.id}')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
-                                    <button onclick="AnncActions.delete('${a.id}')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>`}
-                `;
-            },
-
-            // 5. Users Table View
-            usersTable: (el) => {
-                const users = {};
-                allOrders.forEach(o => {
-                    if (!users[o.uid]) users[o.uid] = { name: o.customerName, orders: [], lastActive: o.timestamp };
-                    users[o.uid].orders.push(o);
-                    if (o.timestamp > users[o.uid].lastActive) users[o.uid].lastActive = o.timestamp;
-                });
-                const userList = Object.values(users);
-
-                if (userList.length === 0) return Render.emptyState(el, 'ยังไม่มีฐานข้อมูลลูกค้า');
-
-                el.innerHTML = `
-                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
-                        ${userList.map(u => {
-                            const completedCount = u.orders.filter(o => o.status === 'completed').length;
-                            return `
-                            <div class="card-panel flex items-center gap-5 hover-card">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center text-2xl font-bold text-slate-600 dark:text-slate-300 shadow-inner">
-                                    ${u.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-1">${u.name}</h4>
-                                    <div class="flex items-center gap-3 text-sm mb-2">
-                                        <span class="bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-box"></i> ${u.orders.length} ทั้งหมด</span>
-                                        <span class="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-check"></i> ${completedCount} เสร็จสิ้น</span>
-                                    </div>
-                                     <div class="text-xs text-slate-400">ใช้งานล่าสุด: ${dayjs(u.lastActive?.toDate()).fromNow()}</div>
-                                </div>
-                            </div>
-                        `}).join('')}
-                    </div>`;
-            },
-
-            // Utilities
-            statusBadge: (s) => {
-                const map = { 'pending': ['st-pending', 'รอรับงาน', 'fa-inbox'], 'working': ['st-working', 'กำลังทำ', 'fa-hammer'], 'testing': ['st-testing', 'ตรวจสอบ (QC)', 'fa-vial'], 'completed': ['st-completed', 'เสร็จสิ้น', 'fa-circle-check'], 'cancelled': ['st-cancelled', 'ยกเลิก', 'fa-ban'] };
-                const [cls, label, icon] = map[s] || map['pending'];
-                return `<span class="status-badge ${cls} flex items-center gap-1"><i class="fa-solid ${icon}"></i> ${label}</span>`;
-            },
-            emptyState: (el, msg) => {
-                const html = `<div class="flex flex-col items-center justify-center h-[60vh] text-slate-300 dark:text-slate-600 animate__animated animate__fadeIn"><i class="fa-solid fa-folder-open text-6xl mb-4 opacity-50 animate-bounce"></i><p class="text-xl font-bold">${msg}</p></div>`;
-                if(el) el.innerHTML = html; else return html;
-            }
+            // Save to a fixed ID 'main' so we just update it
+            await setDoc(doc(db, 'system_announcements', 'main'), {
+                title: title, message: msg, isActive: active, updatedAt: serverTimestamp()
+            });
+            window.toggleAnnc();
         };
-
-        // --- MODAL CONTROLLER ---
-        window.Modal = {
-            openOrder: (id) => {
-                const o = allOrders.find(x => x.id === id);
-                if (!o) return;
-                currentOrderId = id;
-                document.getElementById('modal-shopname').innerText = o.shopName;
-                document.getElementById('modal-date').innerText = dayjs(o.timestamp?.toDate()).format('D MMM YYYY, HH:mm น.');
-                document.getElementById('modal-customer').value = o.customerName;
-                document.getElementById('modal-adm-email').value = o.adminEmail;
-                document.getElementById('modal-adm-pass').value = o.adminPass;
-                document.getElementById('modal-admin-notes').value = o.adminNotes || '';
-                Modal.updateStatusUI(o.status);
-                const modal = document.getElementById('order-modal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex'); // Ensure flex for centering
-            },
-            updateStatusUI: (currentStatus) => {
-                 document.querySelectorAll('#order-modal [id^="btn-st-"]').forEach(btn => {
-                     btn.classList.remove('border-brand-500', 'bg-brand-50', 'dark:border-brand-400', 'dark:bg-brand-900/20', 'opacity-100', 'ring-2', 'ring-brand-500/30');
-                     btn.classList.add('opacity-60');
-                 });
-                const activeBtn = document.getElementById(`btn-st-${currentStatus}`);
-                if(activeBtn) {
-                     activeBtn.classList.remove('border-slate-200', 'dark:border-slate-700', 'opacity-60');
-                     activeBtn.classList.add('border-brand-500', 'bg-brand-50', 'dark:border-brand-400', 'dark:bg-brand-900/20', 'opacity-100', 'ring-2', 'ring-brand-500/30');
-                }
-            },
-             openAnnc: (id = null) => {
-                const modal = document.getElementById('annc-modal');
-                const title = document.getElementById('annc-modal-title');
-                const inpId = document.getElementById('annc-id');
-                const inpTitle = document.getElementById('annc-title');
-                const inpMsg = document.getElementById('annc-message');
-                const inpActive = document.getElementById('annc-active');
-                
-                inpId.value = id || '';
-                if(id) {
-                    const a = allAnnouncements.find(x => x.id === id);
-                    title.innerText = 'แก้ไขประกาศ';
-                    inpTitle.value = a.title;
-                    inpMsg.value = a.message;
-                    inpActive.checked = a.isActive;
-                } else {
-                    title.innerText = 'สร้างประกาศใหม่';
-                    inpTitle.value = '';
-                    inpMsg.value = '';
-                    inpActive.checked = true;
-                }
-                modal.classList.remove('hidden'); modal.classList.add('flex');
-            },
-            close: (id) => {
-                 document.getElementById(id).classList.add('hidden');
-                 document.getElementById(id).classList.remove('flex');
-                 currentOrderId = null;
-            }
-        };
-
-        // --- ACTION CONTROLLERS (DB Operations) ---
-        window.OrderActions = {
-            updateStatus: async (newStatus) => {
-                if (!currentOrderId) return;
-                try {
-                    await updateDoc(doc(db, "web_orders", currentOrderId), { status: newStatus });
-                    Modal.updateStatusUI(newStatus);
-                    Toast.show('success', `อัปเดตสถานะเป็น "${newStatus.toUpperCase()}" เรียบร้อย`);
-                } catch (e) { Toast.show('error', e.message); }
-            },
-            saveCredentials: async () => {
-                if (!currentOrderId) return;
-                const email = document.getElementById('modal-adm-email').value;
-                const pass = document.getElementById('modal-adm-pass').value;
-                try {
-                    await updateDoc(doc(db, "web_orders", currentOrderId), { adminEmail: email, adminPass: pass });
-                    Toast.show('success', 'บันทึกข้อมูลเข้าระบบเรียบร้อย');
-                } catch (e) { Toast.show('error', e.message); }
-            },
-            saveNotes: async () => {
-                 if (!currentOrderId) return;
-                 const notes = document.getElementById('modal-admin-notes').value;
-                 try {
-                    await updateDoc(doc(db, "web_orders", currentOrderId), { adminNotes: notes });
-                    Toast.show('success', 'บันทึกโน้ตลับเรียบร้อย');
-                } catch (e) { Toast.show('error', e.message); }
-            },
-            deleteOrder: async () => {
-                if (!currentOrderId) return;
-                Swal.fire({
-                    title: 'ยืนยันการลบถาวร?', text: "ข้อมูลนี้จะไม่สามารถกู้คืนได้!", icon: 'warning',
-                    showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ใช่, ลบทันที', cancelButtonText: 'ยกเลิก',
-                     customClass: { popup: 'dark:bg-dark-card dark:text-white' }
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            await deleteDoc(doc(db, "web_orders", currentOrderId));
-                            Modal.close('order-modal');
-                            Toast.show('success', 'ลบออเดอร์เรียบร้อยแล้ว');
-                        } catch (e) { Toast.show('error', 'ไม่สามารถลบได้: ' + e.message); }
-                    }
-                });
-            }
-        };
-
-        window.AnncActions = {
-            save: async () => {
-                const id = document.getElementById('annc-id').value;
-                const title = document.getElementById('annc-title').value;
-                const message = document.getElementById('annc-message').value;
-                const isActive = document.getElementById('annc-active').checked;
-                if(!title || !message) return Toast.show('error', 'กรุณากรอกข้อมูลให้ครบ');
-                
-                const data = { title, message, isActive, updatedAt: serverTimestamp() };
-                try {
-                    if(id) { await updateDoc(doc(db, "system_announcements", id), data); Toast.show('success', 'แก้ไขประกาศสำเร็จ'); }
-                    else { await addDoc(collection(db, "system_announcements"), data); Toast.show('success', 'สร้างประกาศใหม่สำเร็จ'); }
-                    Modal.close('annc-modal');
-                } catch(e) { Toast.show('error', e.message); }
-            },
-            delete: async (id) => {
-                 Swal.fire({
-                    title: 'ลบประกาศนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444',
-                     customClass: { popup: 'dark:bg-dark-card dark:text-white' }
-                }).then(async (r) => {
-                    if(r.isConfirmed) { await deleteDoc(doc(db, "system_announcements", id)); Toast.show('success', 'ลบประกาศแล้ว'); }
-                });
-            }
-        }
-
-        // Start App
-        App.init();
     </script>
 </body>
 </html>
