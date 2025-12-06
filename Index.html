@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Store Admin - จัดการออเดอร์</title>
+    <title>Super Admin Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,27 +15,29 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; color: #1e293b; }
-        .sidebar { width: 260px; height: 100vh; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 50; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .sidebar { width: 260px; height: 100vh; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 50; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; margin: 4px 12px; border-radius: 10px; cursor: pointer; color: #64748b; font-weight: 500; transition: 0.2s; }
-        .nav-item.active { background: #2563eb; color: white; }
-        .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-left: auto; color: white; font-weight: bold; }
+        .nav-item.active { background: #2563eb; color: white; font-weight: 700; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); }
         .order-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
-        .card-status-line { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .order-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05); }
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
     </style>
 </head>
 <body class="flex h-screen">
 
     <aside class="sidebar shadow-xl">
         <div class="h-20 flex items-center px-6 border-b border-gray-100">
-            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-cube text-blue-600"></i> Q-Store Admin</h1>
+            <h1 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-cube text-blue-600"></i> Admin Panel</h1>
         </div>
         
-        <nav class="flex-1 p-4 space-y-1">
-            <div onclick="App.setTab('pending')" id="tab-pending" class="nav-item active"><i class="fa-solid fa-inbox w-5"></i> คำสั่งซื้อใหม่ <span id="badge-pending" class="badge bg-red-500 hidden">0</span></div>
-            <div onclick="App.setTab('working')" id="tab-working" class="nav-item"><i class="fa-solid fa-hammer w-5"></i> กำลังดำเนินการ <span id="badge-working" class="badge bg-blue-500 hidden">0</span></div>
-            <div onclick="App.setTab('completed')" id="tab-completed" class="nav-item"><i class="fa-solid fa-check-circle w-5"></i> เสร็จสิ้น</div>
+        <nav class="flex-1 py-6 space-y-1">
+            <div onclick="Router('dashboard')" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-chart-line w-5"></i> Dashboard</div>
+            <div onclick="Router('orders')" id="nav-orders" class="nav-item"><i class="fa-solid fa-list-check w-5"></i> จัดการออเดอร์</div>
+            <div onclick="Router('history')" id="nav-history" class="nav-item"><i class="fa-solid fa-clock-rotate-left w-5"></i> ประวัติงาน</div>
+            <div onclick="Router('customers')" id="nav-customers" class="nav-item"><i class="fa-solid fa-users w-5"></i> จัดการผู้ใช้</div>
         </nav>
+        
         <div class="p-4 border-t border-gray-100">
             <button onclick="Auth.logout()" class="w-full py-2 text-sm text-red-500 font-bold bg-red-50 rounded-lg hover:bg-red-100"><i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ</button>
         </div>
@@ -43,27 +45,24 @@
 
     <main class="flex-1 flex flex-col relative bg-gray-100">
         <header class="h-20 bg-white/80 backdrop-blur border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
-            <h2 id="page-title" class="text-2xl font-bold text-slate-800">คำสั่งซื้อใหม่ (New Orders)</h2>
+            <h2 id="page-title" class="text-2xl font-bold text-slate-800">Dashboard</h2>
             <div class="text-sm text-gray-500 font-medium">Super Admin: faris@gmail.com</div>
         </header>
 
         <div id="content-area" class="flex-1 overflow-y-auto p-8">
-            <div id="loading" class="absolute inset-0 flex items-center justify-center text-slate-400"><div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i><br>กำลังโหลดข้อมูล...</div></div>
-            <div id="order-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-        </div>
+            </div>
     </main>
 
     <div id="login-modal" class="fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center shadow-2xl">
-            <h2 class="text-xl font-bold mb-6">เข้าสู่ระบบหลังบ้าน</h2>
+        <div class="bg-white p-8 rounded-xl w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-xl font-bold mb-6">เข้าสู่ระบบ Super Admin</h2>
             <input id="adm-email" class="w-full p-3 border rounded-xl mb-3 bg-slate-50 text-center" value="faris@gmail.com" readonly>
-            <input id="adm-pass" type="password" class="w-full p-3 border rounded-xl mb-6 bg-slate-50" placeholder="รหัสผ่านของคุณ">
+            <input id="adm-pass" type="password" class="w-full p-3 border rounded-xl mb-6 bg-slate-50" placeholder="รหัสผ่าน">
             <button onclick="Auth.login()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700">เข้าสู่ระบบ</button>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
             authDomain: "rsdm-9ca2a.firebaseapp.com",
@@ -78,102 +77,21 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- 2. CODE TEMPLATES (ยัดไส้โค้ด Client/Admin ตัวเต็มเข้าไป) ---
-        // ใช้ \u003Cscript> เพื่อหลีกเลี่ยงการพังของโค้ดเมื่ออยู่ใน string
-        
-        const TPL_CLIENT = `<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จองคิว - {{SHOP_NAME}}</title>
-    <script src="https://cdn.tailwindcss.com">\u003C/script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">\u003C/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">\u003C/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">\u003C/script>
-    <style>body{font-family:'Sarabun',sans-serif;background-color:#f8fafc}.glass-card{background:rgba(255,255,255,0.98);border-radius:1.5rem;border:1px solid #e2e8f0;box-shadow:0 10px 30px -10px rgba(0,0,0,0.08)}</style>
-</head>
-<body class="min-h-screen flex flex-col pt-16 px-4">
-    <header class="mb-6 flex justify-between items-end max-w-md mx-auto w-full">
-        <div><h1 class="font-bold text-2xl text-slate-800 leading-none" id="shop-name">{{SHOP_NAME}}</h1><div id="shop-badge" class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-xs font-bold shadow-sm border">Online</div></div>
-        <div class="text-right"><div class="text-xs text-slate-400 font-bold uppercase mb-1">คิวปัจจุบัน</div><div class="text-4xl font-black text-slate-800 leading-none" id="current-q">---</div></div>
-    </header>
-    <main class="flex-1 max-w-md mx-auto w-full flex flex-col justify-start relative">
-        <div id="form-section" class="glass-card p-6"><h3 class="font-bold text-xl text-slate-700 mb-4">รับบัตรคิวใหม่</h3><form onsubmit="App.book(event)" class="space-y-4"><input id="inp-name" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="ชื่อลูกค้า" required><input id="inp-phone" type="tel" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="เบอร์โทร"><button class="btn-gradient w-full py-4 rounded-xl font-bold text-lg shadow-lg mt-4">กดรับบัตรคิว</button></form></div>
-        <div id="ticket-section" class="hidden glass-card p-8 text-center"><div class="text-7xl font-black text-slate-800" id="my-q-num">---</div></div>
-        <div id="msg-section" class="hidden text-center p-6"><h2 class="text-2xl font-bold">ขอบคุณที่ใช้บริการ</h2></div>
-    </main>
-    <script>
-        const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
-        firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
-        class CustomerApp {
-            constructor(){this.myId=localStorage.getItem('q_id'); this.init();}
-            init(){ if(this.myId) this.listenTicket(); db.collection('q_system').doc('config').onSnapshot(d=>{ if(d.exists){ document.getElementById('current-q').innerText=d.data().current||'---'; document.getElementById('shop-name').innerText='{{SHOP_NAME}}'; } }); }
-            listenTicket(){ db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(d=>{ const dat=d.data(); if(dat.status==='served') { document.getElementById('ticket-section').classList.add('hidden'); document.getElementById('msg-section').classList.remove('hidden'); } else if(dat.status==='waiting'||dat.status==='called'){ document.getElementById('form-section').classList.add('hidden'); document.getElementById('ticket-section').classList.remove('hidden'); document.getElementById('my-q-num').innerText=dat.number; } else { localStorage.removeItem('q_id'); location.reload(); } }); }
-            async book(e){ e.preventDefault(); await db.runTransaction(async t=>{ const ref=db.collection('q_system').doc('config'); const d=(await t.get(ref)).data(); const next=(d.last||0)+1; const num='A-'+String(next).padStart(3,'0'); const qRef=ref.collection('queues').doc(); t.set(qRef,{number:num, raw:next, name:document.getElementById('inp-name').value, status:'waiting', timestamp:firebase.firestore.FieldValue.serverTimestamp()}); t.update(ref,{last:next}); localStorage.setItem('q_id',qRef.id); this.myId=qRef.id; }); this.listenTicket(); }
-            cancel(){ if(confirm('ยกเลิก?')) db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'}); }
-            logout(){ localStorage.removeItem('q_id'); location.reload(); }
-        }
-        const App=new CustomerApp();
-    \u003C/script>
-</body>
-</html>`;
+        let allOrders = [];
+        const statusMap = {
+            pending: { label: 'รอรับออเดอร์', color: 'bg-yellow-500' },
+            working: { label: 'กำลังทำ', color: 'bg-blue-500' },
+            testing: { label: 'ตรวจสอบ (QC)', color: 'bg-indigo-500' },
+            completed: { label: 'เสร็จสิ้น', color: 'bg-green-500' },
+            cancelled: { label: 'ยกเลิก', color: 'bg-red-500' }
+        };
+        const statusFlow = ['pending', 'working', 'testing', 'completed'];
 
-        const TPL_ADMIN = `<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - {{SHOP_NAME}}</title>
-    <script src="https://cdn.tailwindcss.com">\u003C/script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">\u003C/script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">\u003C/script>
-    <style>body{font-family:'Sarabun',sans-serif;background:#f1f5f9}.btn-action{padding:8px 16px;border-radius:8px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.btn-call{background:#eff6ff;color:#2563eb}.btn-done{background:#ecfdf5;color:#16a34a}</style>
-</head>
-<body class="flex h-screen">
-    <aside class="w-64 bg-white border-r p-6"><h1 class="text-xl font-bold mb-6 text-blue-600">{{SHOP_NAME}}</h1><div class="p-3 bg-blue-50 text-blue-700 rounded font-bold">จัดการคิว</div><div class="mt-4 text-xs text-gray-400">ใช้รหัสผ่านด้านบน Login</div></aside>
-    <main class="flex-1 p-8 overflow-y-auto">
-        <header class="flex justify-between items-center mb-8"><h2 class="text-2xl font-bold">คิวรอเรียก</h2><div class="text-4xl font-black text-blue-600" id="header-current">---</div></header>
-        <div id="tb-live" class="space-y-3">Loading...</div>
-    </main>
-    <script>
-        const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
-        firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
-        class AdminApp {
-            constructor(){ this.qRef=db.collection('q_system').doc('config').collection('queues'); this.cRef=db.collection('q_system').doc('config'); this.init(); }
-            init(){ this.cRef.onSnapshot(d=>{ if(d.exists) document.getElementById('header-current').innerText=d.data().current||'---'; }); this.qRef.orderBy('timestamp','asc').onSnapshot(s=>{
-                    const active=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>['waiting','called'].includes(x.status));
-                    document.getElementById('tb-live').innerHTML = active.map(d=>\`
-                        <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center \${d.status==='called'?'border-blue-500 border-l-4':''}">
-                            <div><span class="text-2xl font-black mr-4">\${d.number}</span> <span class="font-bold">\${d.name}</span></div>
-                            <div class="flex gap-2">
-                                <button onclick="window.Admin.call('\${d.id}','\${d.number}','\${d.name}')" class="btn-action btn-call">เรียก</button>
-                                <button onclick="window.Admin.serve('\${d.id}')" class="btn-action btn-done">จบ</button>
-                            </div>
-                        </div>\`).join('') || '<div class="text-center text-gray-400">ไม่มีคิว</div>';
-                });
-            }
-            call(id,n,nm){ this.qRef.doc(id).update({status:'called',lastCallTime:Date.now(),voiceMessage:'เชิญหมายเลข '+n}); this.cRef.update({current:n}); }
-            serve(id){ this.qRef.doc(id).update({status:'served'}); }
-            resetSystem(){ if(confirm('รีเซ็ต?')) { this.cRef.update({current:'---',last:0}); this.qRef.get().then(s=>{const b=db.batch();s.docs.forEach(d=>b.delete(d.ref));b.commit()}); } }
-        }
-        window.onload=()=>window.Admin=new AdminApp();
-    \u003C/script>
-</body>
-</html>`;
-
-        // --- 4. LOGIC ---
-        let orders = [];
-        let tab = 'pending';
-
+        // --- AUTH & DATA LISTENER ---
         const Auth = {
             login: () => {
-                const e = document.getElementById('adm-email').value;
                 const p = document.getElementById('adm-pass').value;
-                auth.signInWithEmailAndPassword(SUPER_ADMIN, p).catch(err => Swal.fire('ผิดพลาด', err.message, 'error'));
+                auth.signInWithEmailAndPassword(SUPER_ADMIN, p).catch(err => Swal.fire('Error', err.message, 'error'));
             },
             logout: () => auth.signOut().then(() => location.reload())
         };
@@ -191,97 +109,196 @@
             },
 
             fetchOrders: () => {
+                // Listen to all orders for real-time updates across all sections
                 db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                    orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.updateBadges();
-                    App.renderList();
-                    document.getElementById('loading').classList.add('hidden');
+                    allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // Update current view if user is logged in
+                    App.updateCurrentView();
                 });
             },
 
-            updateBadges: () => {
-                const p = orders.filter(o => o.status === 'pending').length;
-                const w = orders.filter(o => ['working', 'testing'].includes(o.status)).length;
-                const b1 = document.getElementById('badge-pending');
-                const b2 = document.getElementById('badge-working');
-                if(p>0){b1.innerText=p;b1.classList.remove('hidden');}else b1.classList.add('hidden');
-                if(w>0){b2.innerText=w;b2.classList.remove('hidden');}else b2.classList.add('hidden');
+            updateCurrentView: () => {
+                const activeNav = document.querySelector('.nav-item.active').id.replace('nav-', '');
+                const el = document.getElementById('content-area');
+
+                if (activeNav === 'dashboard') App.renderDashboard(el);
+                else if (activeNav === 'orders') App.renderOrderTabs(el);
+                else if (activeNav === 'history') App.renderHistory(el);
+                else if (activeNav === 'customers') App.renderCustomers(el);
+            },
+            
+            // --- 1. RENDER DASHBOARD ---
+            renderDashboard: (el) => {
+                document.getElementById('page-title').innerText = 'Dashboard Overview';
+                const count = (status) => allOrders.filter(o => o.status === status).length;
+                const total = allOrders.length;
+                const inProgress = count('working') + count('testing');
+
+                el.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500"><div class="text-xs text-gray-500 font-bold uppercase">กำลังทำ/QC</div><div class="text-3xl font-black text-gray-800">${inProgress}</div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-yellow-500"><div class="text-xs text-gray-500 font-bold uppercase">ออเดอร์ใหม่</div><div class="text-3xl font-black text-gray-800">${count('pending')}</div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500"><div class="text-xs text-gray-500 font-bold uppercase">งานเสร็จสิ้น</div><div class="text-3xl font-black text-gray-800">${count('completed')}</div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-slate-500"><div class="text-xs text-gray-500 font-bold uppercase">รวมทั้งหมด</div><div class="text-3xl font-black text-gray-800">${total}</div></div>
+                    </div>
+                    <h3 class="text-xl font-bold mt-8 mb-4 border-b pb-2">รายการล่าสุด</h3>
+                    <div id="latest-orders" class="space-y-3"></div>
+                `;
+                // Render latest 5 orders
+                const latestOrders = allOrders.slice(0, 5).map(o => `
+                    <div class="bg-white p-4 rounded-lg flex justify-between items-center shadow-sm">
+                        <span class="font-bold text-lg text-blue-600">${o.shopName}</span>
+                        <span class="text-sm ${statusMap[o.status].color} text-white px-2 py-1 rounded-full">${statusMap[o.status].label}</span>
+                    </div>
+                `).join('');
+                document.getElementById('latest-orders').innerHTML = latestOrders || '<p class="text-center text-gray-400">ยังไม่มีออเดอร์</p>';
             },
 
-            setTab: (t) => {
-                tab = t;
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                document.getElementById(`tab-${t}`).classList.add('active');
-                document.getElementById('page-title').innerText = t === 'pending' ? 'คำสั่งซื้อใหม่' : (t === 'working' ? 'กำลังดำเนินการ' : 'เสร็จสิ้นแล้ว');
-                App.renderList();
+            // --- 2. RENDER ORDER TABS ---
+            renderOrderTabs: (el) => {
+                document.getElementById('page-title').innerText = 'จัดการออเดอร์ (Working Flow)';
+                
+                // Tabs HTML structure
+                el.innerHTML = `
+                    <div class="flex space-x-2 mb-6 border-b border-gray-200">
+                        <button onclick="App.setOrderTab('pending')" class="px-4 py-2 text-sm font-bold rounded-t-lg bg-yellow-100 text-yellow-800" id="order-tab-pending">New (${allOrders.filter(o=>o.status==='pending').length})</button>
+                        <button onclick="App.setOrderTab('working')" class="px-4 py-2 text-sm font-bold rounded-t-lg bg-blue-100 text-blue-800" id="order-tab-working">In Progress (${allOrders.filter(o=>o.status==='working' || o.status==='testing').length})</button>
+                        <button onclick="App.setOrderTab('completed')" class="px-4 py-2 text-sm font-bold rounded-t-lg bg-green-100 text-green-800" id="order-tab-completed">Completed (${allOrders.filter(o=>o.status==='completed').length})</button>
+                    </div>
+                    <div id="order-tab-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+                `;
+                
+                App.setOrderTab('pending');
             },
 
-            renderList: () => {
-                const container = document.getElementById('order-list');
+            setOrderTab: (status) => {
+                document.querySelectorAll('[id^="order-tab-"]').forEach(btn => btn.classList.remove('bg-gray-200', 'border-b-4', 'border-blue-600'));
+                document.getElementById(`order-tab-${status}`).classList.add('bg-gray-200', 'border-b-4', 'border-blue-600');
+
+                const container = document.getElementById('order-tab-content');
                 let filtered = [];
-                if (tab === 'pending') filtered = orders.filter(o => o.status === 'pending');
-                else if (tab === 'working') filtered = orders.filter(o => ['working', 'testing'].includes(o.status));
-                else filtered = orders.filter(o => o.status === 'completed');
 
-                if (filtered.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 bg-white rounded-2xl border border-dashed"><i class="fa-solid fa-box-open text-4xl mb-4"></i><br>ไม่มีออเดอร์ในสถานะนี้</div>`; return; }
+                if (status === 'pending') filtered = allOrders.filter(o => o.status === 'pending');
+                else if (status === 'working') filtered = allOrders.filter(o => ['working', 'testing'].includes(o.status));
+                else if (status === 'completed') filtered = allOrders.filter(o => o.status === 'completed');
 
                 container.innerHTML = filtered.map(o => {
-                    const dataJson = encodeURIComponent(JSON.stringify(o));
-                    
-                    // Button Logic
-                    let actions = '';
-                    if (tab === 'pending') {
-                        actions = `<button onclick="App.updateStatus('${o.id}', 'working')" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md"><i class="fa-solid fa-hammer"></i> กดรับงาน (เริ่มทำ)</button>`;
-                    } else if (tab === 'working') {
-                        actions = `
-                            <div class="grid grid-cols-2 gap-3 mt-2">
-                                <button onclick="App.generateCode('${dataJson}')" class="py-2 bg-purple-100 text-purple-700 font-bold rounded-lg border border-purple-200 hover:bg-purple-200"><i class="fa-solid fa-code"></i> เจนโค้ด</button>
-                                <button onclick="App.updateStatus('${o.id}', 'completed')" class="py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700"><i class="fa-solid fa-check"></i> เสร็จสิ้น</button>
-                            </div>`;
-                    } else {
-                        actions = `<div class="w-full py-2 bg-green-50 text-green-600 font-bold rounded-lg text-center border border-green-100"><i class="fa-solid fa-check"></i> ส่งมอบแล้ว</div>`;
-                    }
+                    const nextStep = statusFlow[statusFlow.indexOf(o.status) + 1];
+                    const prevStep = statusFlow[statusFlow.indexOf(o.status) - 1];
+
+                    const actionBtn = (o.status === 'completed') ? `<div class="text-green-600 font-bold">งานเสร็จสิ้นแล้ว</div>` :
+                                      (o.status === 'testing') ? `<button onclick="App.updateStatus('${o.id}', 'completed')" class="bg-green-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-green-700">ส่งมอบ & เสร็จสิ้น</button>` :
+                                      (o.status === 'working') ? `<button onclick="App.updateStatus('${o.id}', 'testing')" class="bg-indigo-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-indigo-700">ย้ายไปตรวจสอบ (QC)</button>` :
+                                      `<button onclick="App.updateStatus('${o.id}', 'working')" class="bg-blue-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-blue-700">รับออเดอร์</button>`;
+
+                    const statusDropdown = (o.status !== 'completed' && o.status !== 'pending') ? `
+                        <select onchange="App.updateStatus('${o.id}', this.value)" class="p-2 border rounded-lg text-xs font-bold bg-white outline-none cursor-pointer mt-2">
+                            <option value="working" ${o.status === 'working' ? 'selected' : ''}>กำลังทำ</option>
+                            <option value="testing" ${o.status === 'testing' ? 'selected' : ''}>ตรวจสอบ (QC)</option>
+                        </select>` : '';
 
                     return `
-                        <div class="order-card p-6 flex flex-col h-full">
-                            <div class="card-status-line ${o.status==='pending'?'bg-red-500':(o.status==='working'?'bg-blue-500':'bg-green-500')}"></div>
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="text-lg font-bold text-gray-800">${o.shopName}</h3>
-                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">${new Date(o.timestamp?.toDate()).toLocaleDateString()}</span>
+                        <div class="order-card p-5 shadow-md border-l-4 ${statusMap[o.status].color.replace('bg', 'border-l')}">
+                            <h4 class="font-bold text-lg text-gray-800">${o.shopName}</h4>
+                            <div class="text-xs text-gray-500 mb-3">${o.customerName} - ${new Date(o.timestamp.toDate()).toLocaleDateString()}</div>
+                            
+                            <div class="bg-gray-50 p-3 rounded-lg text-sm mb-4">
+                                <p>Status: <span class="font-bold ${statusMap[o.status].color.replace('bg', 'text')}">${statusMap[o.status].label}</span></p>
+                                ${statusDropdown}
                             </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm space-y-1 mb-6 flex-1">
-                                <div class="flex justify-between"><span class="text-gray-400">ลูกค้า:</span> <span>${o.customerName}</span></div>
-                                <div class="flex justify-between"><span class="text-gray-400">Email Admin:</span> <span class="text-gray-700 select-all">${o.adminEmail}</span></div>
-                                <div class="flex justify-between"><span class="text-gray-400">Password:</span> <span class="text-gray-700 select-all">${o.adminPass}</span></div>
+                            
+                            <div class="flex justify-between items-center">
+                                ${actionBtn}
+                                <button onclick="App.showDetails('${o.shopName}', '${o.adminEmail}', '${o.adminPass}')" class="text-sm text-purple-600 hover:underline"><i class="fa-solid fa-eye"></i> รายละเอียด</button>
                             </div>
-                            <div class="mt-auto">${actions}</div>
-                        </div>`;
+                        </div>
+                    `;
                 }).join('');
             },
 
-            updateStatus: (id, val) => {
-                db.collection('web_orders').doc(id).update({status: val});
+            // --- 3. RENDER HISTORY ---
+            renderHistory: (el) => {
+                document.getElementById('page-title').innerText = 'ประวัติงานเสร็จสิ้นและยกเลิก';
+                const history = allOrders.filter(o => ['completed', 'cancelled'].includes(o.status));
+                el.innerHTML = `
+                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50"><tr><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">ร้านค้า</th><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">ลูกค้า</th><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">สถานะ</th><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">วันที่เสร็จ</th></tr></thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${history.map(h => `
+                                    <tr>
+                                        <td class="p-3 font-bold text-blue-600">${h.shopName}</td>
+                                        <td class="p-3">${h.customerName}</td>
+                                        <td class="p-3"><span class="status-badge ${statusMap[h.status].color} text-white">${statusMap[h.status].label}</span></td>
+                                        <td class="p-3 text-sm">${new Date(h.timestamp.toDate()).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             },
 
-            generateCode: (jsonStr) => {
-                const o = JSON.parse(decodeURIComponent(jsonStr));
-                
-                // แทนที่ข้อมูลลูกค้าลงใน Template (ใช้ escape symbol เพื่อป้องกัน code break)
-                let cCode = TPL_CLIENT.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
-                let aCode = TPL_ADMIN.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{ADM_EMAIL}}/g, o.adminEmail).replace(/{{ADM_PASS}}/g, o.adminPass).replace(/{{API_KEY}}/g, firebaseConfig.apiKey).replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId).replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId).replace(/{{APP_ID}}/g, firebaseConfig.appId);
+            // --- 4. RENDER CUSTOMERS ---
+            renderCustomers: (el) => {
+                document.getElementById('page-title').innerText = 'จัดการบัญชีลูกค้า';
+                // Get unique customers from orders
+                const uniqueUids = [...new Set(allOrders.map(o => o.uid))];
+                const customers = uniqueUids.map(uid => allOrders.find(o => o.uid === uid));
 
+                el.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50"><tr><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">ชื่อลูกค้า</th><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">อีเมล</th><th class="p-3 text-left text-xs font-medium text-gray-500 uppercase">จำนวนออเดอร์</th></tr></thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${customers.map(c => `
+                                    <tr>
+                                        <td class="p-3 font-bold">${c.customerName}</td>
+                                        <td class="p-3 text-sm">${c.customerEmail || 'N/A'}</td>
+                                        <td class="p-3">${allOrders.filter(o => o.uid === c.uid).length}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            },
+            
+            // --- ACTIONS ---
+            updateStatus: (id, newStatus) => {
+                db.collection('web_orders').doc(id).update({ status: newStatus }).then(() => {
+                    const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
+                    Toast.fire({icon: 'success', title: `สถานะเปลี่ยนเป็น ${statusMap[newStatus].label}`});
+                });
+            },
+            
+            showDetails: (shopName, adminEmail, adminPass) => {
                 Swal.fire({
-                    title: `Gen Code: ${o.shopName}`, width: '800px',
-                    html: `<div class="text-left space-y-4">
-                            <div><label class="text-xs font-bold text-blue-600 block mb-1">1. โค้ดลูกค้า (client.html)</label><textarea id="tc" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" readonly>${cCode}</textarea><button onclick="navigator.clipboard.writeText(document.getElementById('tc').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button></div>
-                            <div><label class="text-xs font-bold text-purple-600 block mb-1">2. โค้ดแอดมิน (admin.html)</label><textarea id="ta" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-purple-500 outline-none" readonly>${aCode}</textarea><button onclick="navigator.clipboard.writeText(document.getElementById('ta').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button></div>
-                        </div>`,
+                    title: shopName,
+                    html: `<div class="text-left space-y-3 bg-gray-50 p-4 rounded-lg"><p class="text-sm">Admin Email: <b class="select-all">${adminEmail}</b></p><p class="text-sm">Admin Pass: <b class="select-all">${adminPass}</b></p></div>`,
                     showConfirmButton: false, showCloseButton: true
                 });
             }
         };
 
-        App.init();
+        // --- ROUTER ---
+        const Router = (p) => {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${p}`).classList.add('active');
+            
+            // Render the correct section
+            App.updateCurrentView();
+        };
+
+        // Initialize App & Auth Check
+        auth.onAuthStateChanged(user => {
+            if (user && user.email === SUPER_ADMIN) {
+                document.getElementById('login-modal').classList.add('hidden');
+                Router('dashboard');
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        });
     </script>
 </body>
 </html>
