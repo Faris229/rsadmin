@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Admin Pro | จัดการระบบ</title>
+    <title>Q-Service Admin | จัดการระบบ</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -14,150 +15,114 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #ffffff; color: #334155; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #334155; }
         
-        /* Modern Inputs */
-        .input-modern { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; outline: none; transition: 0.2s; font-size: 0.9rem; }
-        .input-modern:focus { background: #fff; border-color: #2563eb; ring: 2px solid #eff6ff; }
+        /* Sidebar Styling */
+        .sidebar { width: 260px; height: 100vh; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 50; }
         
-        /* Status Badge */
-        .badge-status { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .st-pending { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
-        .st-working { background: #eff6ff; color: #3b82f6; border: 1px solid #dbeafe; }
-        .st-testing { background: #f3e8ff; color: #9333ea; border: 1px solid #e9d5ff; }
-        .st-completed { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
-
-        /* Timeline in Modal */
-        .timeline-btn { 
-            flex: 1; text-align: center; padding: 10px; border: 1px solid #e2e8f0; 
-            background: white; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 600;
+        .menu-header { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding: 16px 24px 8px; margin-top: 8px; }
+        
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 10px 24px; 
+            color: #64748b; font-weight: 500; transition: all 0.2s; cursor: pointer; border-left: 3px solid transparent;
         }
-        .timeline-btn:first-child { border-radius: 10px 0 0 10px; }
-        .timeline-btn:last-child { border-radius: 0 10px 10px 0; }
-        .timeline-btn:hover { background: #f8fafc; }
+        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
+        .nav-item.active { background: #eff6ff; color: #2563eb; border-left-color: #2563eb; font-weight: 600; }
         
-        .timeline-btn.active-pending { background: #ef4444; color: white; border-color: #ef4444; }
-        .timeline-btn.active-working { background: #3b82f6; color: white; border-color: #3b82f6; }
-        .timeline-btn.active-testing { background: #9333ea; color: white; border-color: #9333ea; }
-        .timeline-btn.active-completed { background: #16a34a; color: white; border-color: #16a34a; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-left: auto; color: white; font-weight: bold; }
+
+        /* Card & Tables */
+        .content-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .table-head { background: #f8fafc; color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .table-row { border-bottom: 1px solid #f1f5f9; transition: 0.1s; }
+        .table-row:hover { background: #f8fafc; }
+        
+        /* Modal */
+        .glass-modal { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex h-screen overflow-hidden">
 
-    <nav class="border-b border-gray-100 py-4 sticky top-0 bg-white/95 backdrop-blur z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-md"><i class="fa-solid fa-cube"></i></div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight text-slate-800">Q-Service</h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Super Admin Console</p>
-                </div>
+    <aside class="sidebar">
+        <div class="h-16 flex items-center px-6 border-b border-gray-100">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white mr-3 shadow-sm">
+                <i class="fa-solid fa-cube"></i>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden sm:block">
-                    <div class="text-sm font-bold text-slate-800">faris@gmail.com</div>
-                    <div class="text-[10px] text-green-500 font-bold">● Online</div>
-                </div>
-                <button onclick="Auth.logout()" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
-            </div>
+            <span class="font-bold text-lg text-slate-800 tracking-tight">Q-Admin</span>
         </div>
-    </nav>
-
-    <main class="flex-1 bg-gray-50 p-6">
-        <div class="max-w-7xl mx-auto">
+        
+        <nav class="flex-1 overflow-y-auto py-2">
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 font-bold uppercase mb-1">รอรับออเดอร์</div>
-                    <div class="text-3xl font-black text-red-500" id="stat-pending">0</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 font-bold uppercase mb-1">กำลังดำเนินการ</div>
-                    <div class="text-3xl font-black text-blue-500" id="stat-working">0</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 font-bold uppercase mb-1">งานเสร็จสิ้น</div>
-                    <div class="text-3xl font-black text-green-500" id="stat-completed">0</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 font-bold uppercase mb-1">ยอดรวมทั้งหมด</div>
-                    <div class="text-3xl font-black text-slate-800" id="stat-total">0</div>
-                </div>
+            <div class="menu-header">ภาพรวม (Overview)</div>
+            <div onclick="Router('dashboard')" id="nav-dashboard" class="nav-item active">
+                <i class="fa-solid fa-chart-pie w-5"></i> แดชบอร์ด
             </div>
 
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-ul text-slate-400"></i> รายการสั่งซื้อทั้งหมด</h2>
-                <div class="relative w-full md:w-64">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
-                    <input type="text" id="search-box" onkeyup="App.filterOrders()" class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="ค้นหาชื่อร้าน...">
-                </div>
+            <div class="menu-header">จัดการงาน (Orders)</div>
+            <div onclick="Router('orders-new')" id="nav-orders-new" class="nav-item">
+                <i class="fa-solid fa-inbox w-5"></i> คำสั่งซื้อใหม่ 
+                <span id="badge-new" class="badge bg-red-500 hidden">0</span>
+            </div>
+            <div onclick="Router('orders-working')" id="nav-orders-working" class="nav-item">
+                <i class="fa-solid fa-hammer w-5"></i> กำลังดำเนินการ
+                <span id="badge-working" class="badge bg-blue-500 hidden">0</span>
+            </div>
+            <div onclick="Router('orders-history')" id="nav-orders-history" class="nav-item">
+                <i class="fa-solid fa-clock-rotate-left w-5"></i> ประวัติงานเสร็จ
             </div>
 
-            <div id="loading" class="text-center py-20 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i><br>กำลังโหลดข้อมูล...</div>
-            <div id="order-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                </div>
+            <div class="menu-header">ข้อมูล (Data)</div>
+            <div onclick="Router('users')" id="nav-users" class="nav-item">
+                <i class="fa-solid fa-users w-5"></i> จัดการผู้ใช้ (Users)
+            </div>
+        </nav>
 
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center gap-3 mb-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400"><i class="fa-solid fa-user"></i></div>
+                <div class="overflow-hidden">
+                    <div class="text-xs font-bold text-slate-700 truncate">faris@gmail.com</div>
+                    <div class="text-[10px] text-slate-400">Super Admin</div>
+                </div>
+            </div>
+            <button onclick="Auth.logout()" class="w-full py-2 text-xs text-red-500 font-bold bg-red-50 rounded-lg hover:bg-red-100 transition">ออกจากระบบ</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative bg-slate-50">
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-30">
+            <h2 id="page-title" class="text-xl font-bold text-slate-800">Dashboard</h2>
+            <div class="flex items-center gap-2 text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> System Online
+            </div>
+        </header>
+
+        <div id="content-area" class="flex-1 overflow-y-auto p-8">
+            <div id="loading" class="flex flex-col items-center justify-center h-full text-slate-400">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2"></i>
+                <p>กำลังโหลดข้อมูล...</p>
+            </div>
         </div>
     </main>
 
-    <div id="detail-modal" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center hidden backdrop-blur-sm p-4">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform transition-all scale-100">
+    <div id="detail-modal" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                <div>
-                    <h3 class="font-bold text-lg text-slate-800" id="modal-shopname">Shop Name</h3>
-                    <div class="text-xs text-slate-500" id="modal-date">Date</div>
-                </div>
-                <button onclick="Modal.close()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="font-bold text-lg text-slate-800" id="modal-title">รายละเอียด</h3>
+                <button onclick="Modal.close()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-
-            <div class="p-6">
-                <div class="mb-6">
-                    <label class="text-xs font-bold text-slate-400 block mb-2">อัปเดตสถานะงาน (คลิกเพื่อเปลี่ยน)</label>
-                    <div class="flex w-full shadow-sm rounded-xl overflow-hidden" id="status-group">
-                        <div onclick="Modal.updateStatus('pending')" class="timeline-btn" id="btn-st-pending">รับออเดอร์</div>
-                        <div onclick="Modal.updateStatus('working')" class="timeline-btn" id="btn-st-working">กำลังทำ</div>
-                        <div onclick="Modal.updateStatus('testing')" class="timeline-btn" id="btn-st-testing">ตรวจสอบ</div>
-                        <div onclick="Modal.updateStatus('completed')" class="timeline-btn" id="btn-st-completed">เสร็จสิ้น</div>
-                    </div>
+            <div class="p-6" id="modal-body">
                 </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="col-span-2">
-                        <label class="text-xs font-bold text-slate-400 ml-1">ลูกค้า (Customer)</label>
-                        <input id="modal-customer" class="input-modern bg-slate-50 text-slate-500" readonly>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 ml-1">Admin Email</label>
-                        <input id="modal-adm-email" class="input-modern">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 ml-1">Admin Password</label>
-                        <input id="modal-adm-pass" class="input-modern">
-                    </div>
-                </div>
-
-                <div class="flex gap-3 pt-4 border-t border-slate-50">
-                    <button onclick="Modal.saveData()" class="flex-1 bg-black text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">
-                        <i class="fa-solid fa-save mr-2"></i> บันทึกข้อมูล
-                    </button>
-                    <button onclick="Modal.deleteOrder()" class="px-4 py-3 text-red-500 font-bold bg-red-50 rounded-xl hover:bg-red-100 transition">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div id="login-overlay" class="fixed inset-0 bg-white z-[100] flex items-center justify-center hidden">
-        <div class="w-full max-w-sm p-8 text-center">
-            <div class="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-xl"><i class="fa-solid fa-cube"></i></div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Q-Service Admin</h2>
-            <p class="text-slate-400 text-sm mb-8">ระบบจัดการสำหรับผู้ดูแล</p>
-            <input id="login-email" class="input-modern mb-3 text-center" value="faris@gmail.com" readonly>
-            <input id="login-pass" type="password" class="input-modern mb-6 text-center" placeholder="Password">
-            <button onclick="Auth.login()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/90 z-[60] flex items-center justify-center hidden">
+        <div class="bg-white p-10 rounded-2xl w-full max-w-sm text-center shadow-xl">
+            <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-blue-500/30"><i class="fa-solid fa-shield-halved"></i></div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Access</h2>
+            <p class="text-slate-400 text-sm mb-8">กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบ</p>
+            <input id="adm-pass" type="password" class="w-full p-3 border border-slate-200 rounded-xl mb-4 text-center focus:border-blue-500 outline-none" placeholder="Password">
+            <button onclick="Auth.login()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition">เข้าสู่ระบบ</button>
         </div>
     </div>
 
@@ -176,148 +141,276 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        let ordersData = [];
-        let currentOrderId = null;
+        let allOrders = [];
+        let currentView = 'dashboard';
 
         // --- AUTH ---
         const Auth = {
             login: () => {
-                const p = document.getElementById('login-pass').value;
-                auth.signInWithEmailAndPassword(SUPER_ADMIN, p).catch(e => Swal.fire('Error', e.message, 'error'));
+                const p = document.getElementById('adm-pass').value;
+                auth.signInWithEmailAndPassword(SUPER_ADMIN, p).catch(e => Swal.fire('ผิดพลาด', e.message, 'error'));
             },
             logout: () => auth.signOut().then(()=>location.reload())
         };
 
-        // --- APP ---
+        // --- APP CONTROLLER ---
         const App = {
             init: () => {
                 auth.onAuthStateChanged(user => {
                     if (user && user.email === SUPER_ADMIN) {
-                        document.getElementById('login-overlay').classList.add('hidden');
-                        App.loadOrders();
+                        document.getElementById('login-modal').classList.add('hidden');
+                        App.fetchData();
                     } else {
-                        document.getElementById('login-overlay').classList.remove('hidden');
+                        document.getElementById('login-modal').classList.remove('hidden');
                     }
                 });
             },
-            loadOrders: () => {
+            fetchData: () => {
                 db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                    ordersData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    App.renderGrid(ordersData);
-                    App.updateStats();
+                    allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     document.getElementById('loading').classList.add('hidden');
+                    App.updateBadges();
+                    Router(currentView); // Refresh current view
                 });
             },
-            updateStats: () => {
-                const count = (s) => ordersData.filter(o => o.status === s).length;
-                document.getElementById('stat-pending').innerText = count('pending');
-                document.getElementById('stat-working').innerText = count('working') + count('testing');
-                document.getElementById('stat-completed').innerText = count('completed');
-                document.getElementById('stat-total').innerText = ordersData.length;
-            },
-            renderGrid: (list) => {
-                const grid = document.getElementById('order-grid');
-                if(list.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">ไม่พบข้อมูล</div>`; return; }
+            updateBadges: () => {
+                const pending = allOrders.filter(o => o.status === 'pending').length;
+                const working = allOrders.filter(o => ['working','testing'].includes(o.status)).length;
                 
-                grid.innerHTML = list.map(o => {
-                    let badgeClass = '';
-                    let statusLabel = '';
-                    if(o.status==='pending') { badgeClass='st-pending'; statusLabel='รอรับออเดอร์'; }
-                    else if(o.status==='working') { badgeClass='st-working'; statusLabel='กำลังดำเนินการ'; }
-                    else if(o.status==='testing') { badgeClass='st-testing'; statusLabel='ตรวจสอบ (QC)'; }
-                    else { badgeClass='st-completed'; statusLabel='เสร็จสิ้น'; }
+                const b1 = document.getElementById('badge-new');
+                const b2 = document.getElementById('badge-working');
+                
+                if(pending>0) { b1.innerText=pending; b1.classList.remove('hidden'); } else b1.classList.add('hidden');
+                if(working>0) { b2.innerText=working; b2.classList.remove('hidden'); } else b2.classList.add('hidden');
+            }
+        };
 
-                    return `
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer group" onclick="Modal.open('${o.id}')">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="badge-status ${badgeClass}">${statusLabel}</span>
-                                <span class="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded">${new Date(o.timestamp?.toDate()).toLocaleDateString()}</span>
+        // --- ROUTER & RENDERERS ---
+        function Router(view) {
+            currentView = view;
+            
+            // Update Active Menu
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            let navId = view;
+            if(view.startsWith('orders-')) navId = 'orders-' + view.split('-')[1]; // map sub-views back to main nav if needed, but here we have specific IDs
+            if(document.getElementById('nav-'+view)) document.getElementById('nav-'+view).classList.add('active');
+
+            const content = document.getElementById('content-area');
+            const title = document.getElementById('page-title');
+
+            if (view === 'dashboard') {
+                title.innerText = 'ภาพรวมระบบ (Dashboard)';
+                renderDashboard(content);
+            } else if (view === 'orders-new') {
+                title.innerText = 'คำสั่งซื้อใหม่ (New Orders)';
+                renderOrderList(content, 'pending');
+            } else if (view === 'orders-working') {
+                title.innerText = 'กำลังดำเนินการ (In Progress)';
+                renderOrderList(content, 'working');
+            } else if (view === 'orders-history') {
+                title.innerText = 'ประวัติงานเสร็จ (Completed)';
+                renderOrderList(content, 'completed');
+            } else if (view === 'users') {
+                title.innerText = 'จัดการผู้ใช้งาน (Customers)';
+                renderUserList(content);
+            }
+        }
+
+        // 1. Dashboard View
+        function renderDashboard(el) {
+            const pending = allOrders.filter(o => o.status === 'pending').length;
+            const working = allOrders.filter(o => ['working','testing'].includes(o.status)).length;
+            const completed = allOrders.filter(o => o.status === 'completed').length;
+            const users = new Set(allOrders.map(o => o.uid)).size;
+
+            el.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-2">ออเดอร์รอรับ</div>
+                        <div class="text-3xl font-black text-red-500">${pending}</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-2">กำลังทำ / QC</div>
+                        <div class="text-3xl font-black text-blue-500">${working}</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-2">งานเสร็จสิ้น</div>
+                        <div class="text-3xl font-black text-green-500">${completed}</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-2">ลูกค้าทั้งหมด</div>
+                        <div class="text-3xl font-black text-slate-700">${users}</div>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-lg text-slate-700 mb-4">กิจกรรมล่าสุด</h3>
+                <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                    ${allOrders.slice(0, 5).map(o => `
+                        <div class="px-6 py-4 border-b border-slate-50 flex justify-between items-center hover:bg-slate-50 transition">
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm">${o.shopName}</div>
+                                <div class="text-xs text-slate-400">${new Date(o.timestamp?.toDate()).toLocaleString()}</div>
                             </div>
-                            <h3 class="font-bold text-lg text-slate-800 mb-1 group-hover:text-blue-600 transition">${o.shopName}</h3>
-                            <p class="text-sm text-slate-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-user text-xs"></i> ${o.customerName}</p>
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-500 uppercase">${o.status}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // 2. Orders View (New, Working, History)
+        function renderOrderList(el, type) {
+            let filtered = [];
+            if(type === 'pending') filtered = allOrders.filter(o => o.status === 'pending');
+            else if(type === 'working') filtered = allOrders.filter(o => ['working','testing'].includes(o.status));
+            else filtered = allOrders.filter(o => ['completed','cancelled'].includes(o.status));
+
+            if(filtered.length === 0) {
+                el.innerHTML = `<div class="flex flex-col items-center justify-center h-64 text-slate-400"><i class="fa-solid fa-box-open text-4xl mb-3"></i><p>ไม่มีข้อมูลในหน้านี้</p></div>`;
+                return;
+            }
+
+            el.innerHTML = `
+                <div class="grid grid-cols-1 gap-4">
+                    ${filtered.map(o => `
+                        <div class="content-card p-5 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition">
+                            <div class="mb-4 md:mb-0">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">${o.shopName.charAt(0)}</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-lg">${o.shopName}</h4>
+                                        <div class="text-xs text-slate-500 flex items-center gap-2">
+                                            <i class="fa-solid fa-user"></i> ${o.customerName}
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            ${new Date(o.timestamp?.toDate()).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <div class="border-t border-slate-50 pt-3 flex justify-between items-center text-xs">
-                                <span class="text-slate-400 truncate w-32">${o.adminEmail}</span>
-                                <span class="font-bold text-slate-300 group-hover:text-blue-500 flex items-center gap-1">จัดการ <i class="fa-solid fa-arrow-right"></i></span>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <div class="text-right hidden md:block">
+                                    <div class="text-xs text-slate-400 font-bold uppercase">Status</div>
+                                    <div class="text-sm font-bold ${getStatusColor(o.status)}">${o.status.toUpperCase()}</div>
+                                </div>
+                                <button onclick="Modal.openOrder('${o.id}')" class="flex-1 md:flex-none px-5 py-2 bg-slate-900 text-white text-sm font-bold rounded-lg hover:bg-slate-700 transition shadow-lg shadow-slate-200">
+                                    จัดการ <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
                             </div>
                         </div>
-                    `;
-                }).join('');
-            },
-            filterOrders: () => {
-                const term = document.getElementById('search-box').value.toLowerCase();
-                const filtered = ordersData.filter(o => o.shopName.toLowerCase().includes(term) || o.customerName.toLowerCase().includes(term));
-                App.renderGrid(filtered);
-            }
-        };
+                    `).join('')}
+                </div>
+            `;
+        }
 
-        // --- MODAL LOGIC ---
+        // 3. Users View (New Feature!)
+        function renderUserList(el) {
+            // Group orders by UID
+            const users = {};
+            allOrders.forEach(o => {
+                if(!users[o.uid]) users[o.uid] = { name: o.customerName, email: o.customerEmail || 'N/A', orders: [], lastActive: o.timestamp };
+                users[o.uid].orders.push(o);
+                if(o.timestamp > users[o.uid].lastActive) users[o.uid].lastActive = o.timestamp;
+            });
+
+            const userList = Object.values(users);
+
+            el.innerHTML = `
+                <div class="content-card overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="p-4 pl-6">ลูกค้า</th>
+                                <th class="p-4">จำนวนงาน</th>
+                                <th class="p-4">ล่าสุดเมื่อ</th>
+                                <th class="p-4 text-right pr-6">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                            ${userList.map(u => `
+                                <tr class="table-row">
+                                    <td class="p-4 pl-6">
+                                        <div class="font-bold text-slate-700">${u.name}</div>
+                                        <div class="text-xs text-slate-400">${u.email}</div>
+                                    </td>
+                                    <td class="p-4"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold">${u.orders.length}</span></td>
+                                    <td class="p-4 text-slate-500">${new Date(u.lastActive?.toDate()).toLocaleDateString()}</td>
+                                    <td class="p-4 text-right pr-6">
+                                        <button onclick="Modal.openUser('${u.name}', '${u.orders.length}')" class="text-slate-400 hover:text-blue-600 transition"><i class="fa-solid fa-magnifying-glass"></i> ดูประวัติ</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // --- MODAL & ACTIONS ---
         const Modal = {
-            open: (id) => {
-                const order = ordersData.find(o => o.id === id);
-                if (!order) return;
-                currentOrderId = id;
+            openOrder: (id) => {
+                const o = allOrders.find(x => x.id === id);
+                if(!o) return;
+                
+                const statusOptions = `
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button onclick="Actions.update('${o.id}','working')" class="p-2 text-xs font-bold rounded border ${o.status==='working'?'bg-blue-600 text-white border-blue-600':'bg-white text-slate-500 hover:bg-slate-50'}">กำลังทำ</button>
+                        <button onclick="Actions.update('${o.id}','testing')" class="p-2 text-xs font-bold rounded border ${o.status==='testing'?'bg-purple-600 text-white border-purple-600':'bg-white text-slate-500 hover:bg-slate-50'}">QC</button>
+                        <button onclick="Actions.update('${o.id}','completed')" class="p-2 text-xs font-bold rounded border ${o.status==='completed'?'bg-green-600 text-white border-green-600':'bg-white text-slate-500 hover:bg-slate-50'}">เสร็จสิ้น</button>
+                        <button onclick="Actions.update('${o.id}','cancelled')" class="p-2 text-xs font-bold rounded border ${o.status==='cancelled'?'bg-red-600 text-white border-red-600':'bg-white text-slate-500 hover:bg-slate-50'}">ยกเลิก</button>
+                    </div>
+                `;
 
-                // Fill Data
-                document.getElementById('modal-shopname').innerText = order.shopName;
-                document.getElementById('modal-date').innerText = new Date(order.timestamp?.toDate()).toLocaleString();
-                document.getElementById('modal-customer').value = order.customerName + (order.contact ? ` (${order.contact})` : '');
-                document.getElementById('modal-adm-email').value = order.adminEmail;
-                document.getElementById('modal-adm-pass').value = order.adminPass;
-
-                // Update Status Buttons UI
-                Modal.renderStatusUI(order.status);
-
+                document.getElementById('modal-title').innerText = `จัดการ: ${o.shopName}`;
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
+                            <div class="grid grid-cols-2 gap-4 mb-2">
+                                <div><span class="text-xs text-slate-400 block">ลูกค้า</span><b>${o.customerName}</b></div>
+                                <div><span class="text-xs text-slate-400 block">วันที่สั่ง</span><b>${new Date(o.timestamp?.toDate()).toLocaleDateString()}</b></div>
+                            </div>
+                            <div class="border-t border-slate-200 my-2 pt-2">
+                                <div class="mb-1"><span class="text-xs text-slate-400">Admin Email:</span> <b class="select-all text-blue-600">${o.adminEmail}</b></div>
+                                <div><span class="text-xs text-slate-400">Admin Pass:</span> <b class="select-all text-blue-600">${o.adminPass}</b></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 mb-2 block">เปลี่ยนสถานะ</label>
+                            ${statusOptions}
+                        </div>
+                        <button onclick="Actions.delete('${o.id}')" class="w-full py-2 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50 text-xs">ลบออเดอร์นี้ถาวร</button>
+                    </div>
+                `;
                 document.getElementById('detail-modal').classList.remove('hidden');
             },
-            close: () => {
-                document.getElementById('detail-modal').classList.add('hidden');
-                currentOrderId = null;
+            openUser: (name, count) => {
+                Swal.fire({ title: name, text: `สั่งทำไปแล้วทั้งหมด ${count} งาน`, icon: 'info' });
             },
-            renderStatusUI: (currentStatus) => {
-                ['pending','working','testing','completed'].forEach(s => {
-                    const btn = document.getElementById(`btn-st-${s}`);
-                    btn.className = `timeline-btn ${s === currentStatus ? 'active-'+s : ''}`;
-                });
-            },
-            updateStatus: (newStatus) => {
-                if(!currentOrderId) return;
-                // Just update UI first for snappy feel, save happens on "Save" button or Auto-save? 
-                // Let's Auto-save status for better UX
-                db.collection('web_orders').doc(currentOrderId).update({ status: newStatus }).then(() => {
-                    Modal.renderStatusUI(newStatus);
-                    const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
-                    Toast.fire({icon: 'success', title: 'สถานะอัปเดตแล้ว'});
-                });
-            },
-            saveData: () => {
-                if(!currentOrderId) return;
-                const email = document.getElementById('modal-adm-email').value;
-                const pass = document.getElementById('modal-adm-pass').value;
-                
-                db.collection('web_orders').doc(currentOrderId).update({
-                    adminEmail: email,
-                    adminPass: pass
-                }).then(() => {
-                    Swal.fire('บันทึกสำเร็จ', 'ข้อมูลได้รับการอัปเดต', 'success');
+            close: () => document.getElementById('detail-modal').classList.add('hidden')
+        };
+
+        const Actions = {
+            update: (id, status) => {
+                db.collection('web_orders').doc(id).update({status: status}).then(() => {
                     Modal.close();
+                    const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
+                    Toast.fire({icon: 'success', title: 'อัปเดตสถานะแล้ว'});
                 });
             },
-            deleteOrder: () => {
-                if(!currentOrderId) return;
-                Swal.fire({
-                    title: 'ยืนยันลบ?', text: "ข้อมูลจะหายไปถาวร", icon: 'warning',
-                    showCancelButton: true, confirmButtonColor: '#ef4444'
-                }).then((r) => {
-                    if(r.isConfirmed) {
-                        db.collection('web_orders').doc(currentOrderId).delete().then(() => {
-                            Modal.close();
-                            Swal.fire('ลบแล้ว', '', 'success');
-                        });
-                    }
+            delete: (id) => {
+                Swal.fire({title:'ยืนยันลบ?', text:'กู้คืนไม่ได้นะ', icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444'}).then(r=>{
+                    if(r.isConfirmed) db.collection('web_orders').doc(id).delete().then(()=>Modal.close());
                 });
             }
         };
+
+        function getStatusColor(s) {
+            if(s==='pending') return 'text-red-500';
+            if(s==='working') return 'text-blue-500';
+            if(s==='testing') return 'text-purple-500';
+            if(s==='completed') return 'text-green-500';
+            return 'text-gray-400';
+        }
 
         App.init();
     </script>
