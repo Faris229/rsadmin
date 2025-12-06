@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Service | รับทำระบบจองคิว</title>
-    
+    <title>Store Admin - จัดการออเดอร์</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -16,185 +14,44 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f9fafb; color: #111827; }
-        
-        /* Modern Inputs */
-        .input-modern {
-            width: 100%; padding: 12px 16px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
-            transition: all 0.2s; outline: none; font-size: 0.95rem;
-        }
-        .input-modern:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-
-        /* Modern Buttons */
-        .btn-primary {
-            background: #111827; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600;
-            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-primary:hover { background: #000; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        
-        /* Status Timeline */
-        .timeline-container { display: flex; justify-content: space-between; position: relative; margin-top: 30px; }
-        .timeline-line { position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: #e5e7eb; z-index: 0; }
-        .timeline-step { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; width: 25%; }
-        .step-icon { 
-            width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid #e5e7eb; 
-            display: flex; align-items: center; justify-content: center; color: #9ca3af; transition: 0.3s;
-        }
-        .step-text { margin-top: 8px; font-size: 12px; font-weight: 500; color: #9ca3af; }
-        
-        /* Active Step */
-        .step-active .step-icon { background: #10b981; border-color: #10b981; color: white; box-shadow: 0 0 0 4px #d1fae5; }
-        .step-active .step-text { color: #059669; font-weight: 700; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
+        .sidebar-link { display: flex; align-items: center; padding: 12px 20px; color: #64748b; font-weight: 500; border-radius: 12px; margin-bottom: 4px; transition: 0.2s; cursor: pointer; }
+        .sidebar-link:hover { background: #e2e8f0; color: #1e293b; }
+        .sidebar-link.active { background: #2563eb; color: white; shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .badge-count { background: #ef4444; color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-left: auto; }
+        .order-card { background: white; border-radius: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: 0.2s; }
+        .order-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex h-screen overflow-hidden">
 
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-code"></i></div>
-                <span class="font-bold text-xl tracking-tight">Q-Service</span>
-            </div>
-            
-            <div id="nav-guest" class="flex gap-3">
-                <button onclick="View.show('login')" class="text-sm font-bold text-gray-500 hover:text-black transition">เข้าสู่ระบบ</button>
-                <button onclick="View.show('register')" class="bg-black text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-800 transition">สมัครสมาชิก</button>
-            </div>
-
-            <div id="nav-user" class="hidden flex items-center gap-4">
-                <div class="text-right hidden sm:block">
-                    <div id="user-name" class="text-sm font-bold text-gray-900">User</div>
-                    <div id="user-role" class="text-[10px] text-gray-500 uppercase tracking-wider">Customer</div>
-                </div>
-                <button id="btn-admin-panel" onclick="View.show('admin')" class="hidden bg-purple-50 text-purple-600 px-3 py-1.5 rounded-lg border border-purple-100 text-xs font-bold hover:bg-purple-100 transition">
-                    <i class="fa-solid fa-crown mr-1"></i> จัดการร้านค้า
-                </button>
-                <button onclick="Auth.logout()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-red-50 hover:text-red-500 transition">
-                    <i class="fa-solid fa-power-off"></i>
-                </button>
-            </div>
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20">
+        <div class="h-20 flex items-center px-6 border-b border-gray-100">
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-cube text-blue-600"></i> Q-Store Admin</h1>
         </div>
-    </nav>
+        <nav class="flex-1 p-4 space-y-1">
+            <div onclick="App.switchTab('pending')" id="tab-pending" class="sidebar-link active"><i class="fa-solid fa-inbox w-6"></i> คำสั่งซื้อใหม่ <span id="count-pending" class="badge-count hidden">0</span></div>
+            <div onclick="App.switchTab('working')" id="tab-working" class="sidebar-link"><i class="fa-solid fa-hammer w-6"></i> กำลังดำเนินการ <span id="count-working" class="badge-count bg-blue-500 hidden">0</span></div>
+            <div onclick="App.switchTab('completed')" id="tab-completed" class="sidebar-link"><i class="fa-solid fa-circle-check w-6"></i> เสร็จสิ้นแล้ว</div>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <button onclick="Auth.logout()" class="w-full text-left text-sm text-red-500 font-bold hover:bg-red-50 p-3 rounded-lg transition"><i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ</button>
+        </div>
+    </aside>
 
-    <main id="app" class="flex-1 p-6">
-
-        <section id="page-login" class="hidden max-w-sm mx-auto mt-12 animate__animated animate__fadeIn">
-            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
-                <h2 class="text-2xl font-bold mb-2">ยินดีต้อนรับกลับ</h2>
-                <p class="text-gray-400 text-sm mb-6">เข้าสู่ระบบเพื่อจัดการออเดอร์</p>
-                <div class="space-y-4 text-left">
-                    <div><label class="text-xs font-bold text-gray-500 ml-1">อีเมล</label><input id="l-email" class="input-modern" placeholder="name@example.com"></div>
-                    <div><label class="text-xs font-bold text-gray-500 ml-1">รหัสผ่าน</label><input id="l-pass" type="password" class="input-modern" placeholder="••••••••"></div>
-                    <button onclick="Auth.login()" class="btn-primary w-full">เข้าสู่ระบบ</button>
-                </div>
-                <p class="mt-6 text-xs text-gray-400">ยังไม่มีบัญชี? <button onclick="View.show('register')" class="text-blue-600 font-bold hover:underline">สมัครสมาชิก</button></p>
-            </div>
-        </section>
-
-        <section id="page-register" class="hidden max-w-sm mx-auto mt-12 animate__animated animate__fadeIn">
-            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
-                <h2 class="text-2xl font-bold mb-2">สร้างบัญชีใหม่</h2>
-                <p class="text-gray-400 text-sm mb-6">กรอกข้อมูลเพื่อสั่งทำเว็บจองคิว</p>
-                <div class="space-y-4 text-left">
-                    <div><label class="text-xs font-bold text-gray-500 ml-1">ชื่อของคุณ</label><input id="r-name" class="input-modern" placeholder="ชื่อ-สกุล"></div>
-                    <div><label class="text-xs font-bold text-gray-500 ml-1">อีเมล</label><input id="r-email" class="input-modern" placeholder="name@example.com"></div>
-                    <div><label class="text-xs font-bold text-gray-500 ml-1">รหัสผ่าน</label><input id="r-pass" type="password" class="input-modern" placeholder="กำหนดรหัสผ่าน"></div>
-                    <button onclick="Auth.register()" class="btn-primary w-full">สมัครสมาชิก</button>
-                </div>
-                <p class="mt-6 text-xs text-gray-400">มีบัญชีแล้ว? <button onclick="View.show('login')" class="text-blue-600 font-bold hover:underline">เข้าสู่ระบบ</button></p>
-            </div>
-        </section>
-
-        <section id="page-customer" class="hidden max-w-4xl mx-auto mt-6 animate__animated animate__fadeIn">
-            <div class="grid md:grid-cols-2 gap-8">
-                
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-fit">
-                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"><i class="fa-solid fa-cart-plus"></i></div>
-                        <div>
-                            <h3 class="font-bold text-lg">สั่งทำระบบใหม่</h3>
-                            <p class="text-xs text-gray-400">กรอกข้อมูลร้านให้ครบถ้วน</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-gray-500 ml-1">ชื่อร้าน / เว็บไซต์</label>
-                            <input id="ord-shop" class="input-modern" placeholder="เช่น ร้านตัดผม Barber Cool">
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-xs font-bold text-gray-500 ml-1">Admin Email (ร้าน)</label>
-                                <input id="ord-adm-email" class="input-modern" placeholder="admin@shop.com">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-gray-500 ml-1">Admin Password</label>
-                                <input id="ord-adm-pass" class="input-modern" placeholder="รหัสผ่านร้าน">
-                            </div>
-                        </div>
-                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                            <p class="text-xs text-blue-700 flex items-start gap-2">
-                                <i class="fa-solid fa-circle-info mt-0.5"></i> 
-                                ข้อมูลนี้จะถูกนำไปสร้างเป็นโค้ดเว็บสำเร็จรูปให้คุณ
-                            </p>
-                        </div>
-                        <button onclick="App.createOrder()" class="btn-primary w-full py-3 shadow-lg">ยืนยันการสั่งซื้อ</button>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <a href="https://m.me/YOUR_FACEBOOK_ID" target="_blank" class="block bg-gradient-to-r from-indigo-500 to-purple-600 p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h3 class="font-bold text-lg">ติดต่อทีมงาน</h3>
-                                <p class="text-xs opacity-80 mt-1">สอบถามข้อมูล / แจ้งโอนเงิน</p>
-                            </div>
-                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur">
-                                <i class="fa-brands fa-facebook-messenger text-xl"></i>
-                            </div>
-                        </div>
-                    </a>
-
-                    <div id="order-status-container" class="space-y-4">
-                        <div class="text-center py-10 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-300">
-                            ยังไม่มีรายการสั่งซื้อ
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="page-admin" class="hidden max-w-6xl mx-auto mt-6 animate__animated animate__fadeIn">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group text-purple-600"></i> จัดการออเดอร์ทั้งหมด
-                </h2>
-                <div class="text-sm text-gray-500">Super Admin Mode</div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase">
-                            <tr>
-                                <th class="p-4 pl-6">วันที่</th>
-                                <th class="p-4">ลูกค้า</th>
-                                <th class="p-4">ข้อมูลร้าน (Input)</th>
-                                <th class="p-4">สถานะงาน</th>
-                                <th class="p-4 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-body" class="divide-y divide-gray-50 text-sm">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
+    <main class="flex-1 flex flex-col relative">
+        <header class="h-20 bg-white/80 backdrop-blur border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
+            <h2 id="page-title" class="text-2xl font-bold text-slate-800">คำสั่งซื้อใหม่</h2>
+            <div class="text-sm text-gray-500 font-medium">Logged in as: <span class="text-blue-600">faris@gmail.com</span></div>
+        </header>
+        <div id="content-area" class="flex-1 overflow-y-auto p-8">
+            <div id="loading" class="text-center text-gray-400 mt-20"><i class="fa-solid fa-circle-notch fa-spin text-3xl"></i><br>กำลังโหลดข้อมูล...</div>
+            <div id="order-list" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+        </div>
     </main>
 
     <script>
-        // --- 1. FIREBASE CONFIG ---
+        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
             authDomain: "rsdm-9ca2a.firebaseapp.com",
@@ -204,187 +61,316 @@
             appId: "1:299212700124:web:730160dae6bb1b09cbb719",
             measurementId: "G-CMX9GKW7FF"
         };
-        
-        // *** อีเมลแอดมินของคุณ ***
         const SUPER_ADMIN_EMAIL = "faris@gmail.com"; 
 
-        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- 2. CODE TEMPLATES (ย่อมาเพื่อประหยัดที่ - ของจริงจะยาวกว่านี้) ---
-        // ระบบจะเอาข้อมูลลูกค้าไปแทนที่ {{...}}
-        const TPL_CLIENT = `\n<!DOCTYPE html>\n<html>\n<head>\n<title>{{SHOP_NAME}} - จองคิว</title>\n\n</head>\n<body>\n<h1 id="shop-name">{{SHOP_NAME}}</h1>\n</body>\n</html>`;
+        // --- 2. THE ULTIMATE CODE TEMPLATES (ยัดไส้โค้ดจริงลงไปแล้ว) ---
         
-        const TPL_ADMIN = `\n\n<!DOCTYPE html>\n<html>\n<head>\n<title>Admin - {{SHOP_NAME}}</title>\n\n</head>\n<body>\n<h1>Admin Panel: {{SHOP_NAME}}</h1>\n</body>\n</html>`;
-
-        // --- 3. VIEW CONTROLLER ---
-        const View = {
-            show: (id) => {
-                document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`page-${id}`).classList.remove('hidden');
-            },
-            updateNav: (user) => {
-                if(user) {
-                    document.getElementById('nav-guest').classList.add('hidden');
-                    document.getElementById('nav-user').classList.remove('hidden');
-                    document.getElementById('user-name').innerText = user.displayName || 'ลูกค้า';
-                    
-                    if(user.email === SUPER_ADMIN_EMAIL) {
-                        document.getElementById('btn-admin-panel').classList.remove('hidden');
-                        document.getElementById('user-role').innerText = "Super Admin";
-                    } else {
-                        document.getElementById('btn-admin-panel').classList.add('hidden');
-                        document.getElementById('user-role').innerText = "Customer";
-                    }
-                } else {
-                    document.getElementById('nav-guest').classList.remove('hidden');
-                    document.getElementById('nav-user').classList.add('hidden');
-                }
-            },
-            renderCustomerOrders: (orders) => {
-                const container = document.getElementById('order-status-container');
-                if(orders.length === 0) {
-                    container.innerHTML = `<div class="text-center py-10 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-300">ยังไม่มีรายการสั่งซื้อ</div>`;
-                    return;
-                }
-                
-                container.innerHTML = orders.map(o => {
-                    // Timeline Logic
-                    const steps = ['pending', 'working', 'testing', 'completed'];
-                    const labels = ['รับเรื่อง', 'กำลังทำ', 'ตรวจสอบ', 'เสร็จสิ้น'];
-                    const currentIdx = steps.indexOf(o.status);
-                    
-                    let timeline = `<div class="timeline-container"><div class="timeline-line"></div>`;
-                    labels.forEach((lbl, i) => {
-                        const active = i <= currentIdx ? 'step-active' : '';
-                        const icon = i < currentIdx ? '<i class="fa-solid fa-check"></i>' : (i+1);
-                        timeline += `<div class="timeline-step ${active}"><div class="step-icon">${icon}</div><div class="step-text">${lbl}</div></div>`;
-                    });
-                    timeline += `</div>`;
-
-                    return `
-                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-lg text-gray-800">${o.shopName}</h3>
-                                <span class="text-xs text-gray-400">${new Date(o.timestamp.toDate()).toLocaleDateString()}</span>
-                            </div>
-                            ${timeline}
-                            ${o.status === 'completed' ? `<div class="mt-6 bg-green-50 border border-green-100 text-green-700 p-3 rounded-xl text-center text-sm font-bold"><i class="fa-solid fa-check-circle mr-1"></i> งานเสร็จแล้ว! ติดต่อรับโค้ดทางแชท</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
-            },
-            renderAdminTable: (orders) => {
-                const tbody = document.getElementById('admin-table-body');
-                tbody.innerHTML = orders.map(o => {
-                    const dataJson = encodeURIComponent(JSON.stringify(o));
-                    const statusOpts = ['pending','working','testing','completed'].map(s => 
-                        `<option value="${s}" ${o.status===s?'selected':''}>${s.toUpperCase()}</option>`
-                    ).join('');
-
-                    return `
-                        <tr class="hover:bg-gray-50 border-b border-gray-50">
-                            <td class="p-4 pl-6 text-gray-400">${new Date(o.timestamp.toDate()).toLocaleDateString()}</td>
-                            <td class="p-4 font-bold text-gray-700">${o.customerName}</td>
-                            <td class="p-4">
-                                <div class="font-bold text-blue-600">${o.shopName}</div>
-                                <div class="text-xs text-gray-400 mt-1">U: ${o.adminEmail}</div>
-                                <div class="text-xs text-gray-400">P: ${o.adminPass}</div>
-                            </td>
-                            <td class="p-4">
-                                <select onchange="App.updateStatus('${o.id}', this.value)" class="p-2 border rounded-lg text-xs font-bold bg-white outline-none cursor-pointer hover:border-blue-400 transition">
-                                    ${statusOpts}
-                                </select>
-                            </td>
-                            <td class="p-4 text-center">
-                                <button onclick="App.genCode('${dataJson}')" class="bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-800 transition shadow-sm">
-                                    <i class="fa-solid fa-code mr-1"></i> เจนโค้ด
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+        // 2.1 CLIENT CODE TEMPLATE
+        const RAW_CLIENT_CODE = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>จองคิว - {{SHOP_NAME}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>body{font-family:'Sarabun',sans-serif;background-color:#f8fafc}.glass-card{background:rgba(255,255,255,0.98);border-radius:1.5rem;border:1px solid #e2e8f0;box-shadow:0 10px 30px -10px rgba(0,0,0,0.08)}.btn-gradient{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:white;transition:0.2s}.st-call{animation:pulse 1.5s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}</style>
+</head>
+<body class="min-h-screen flex flex-col pt-16 px-4">
+    <header class="mb-6 flex justify-between items-end max-w-md mx-auto w-full">
+        <div><h1 class="font-bold text-2xl text-slate-800 leading-none" id="shop-name">{{SHOP_NAME}}</h1><div id="shop-badge" class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full text-xs font-bold shadow-sm border">Loading...</div></div>
+        <div class="text-right"><div class="text-xs text-slate-400 font-bold uppercase mb-1">คิวปัจจุบัน</div><div class="text-4xl font-black text-slate-800 leading-none" id="current-q">---</div></div>
+    </header>
+    <main class="flex-1 max-w-md mx-auto w-full flex flex-col justify-start relative">
+        <div id="form-section" class="glass-card p-6 animate__animated animate__fadeInUp">
+            <h3 class="font-bold text-xl text-slate-700 mb-4">รับบัตรคิวใหม่</h3>
+            <form onsubmit="App.book(event)" class="space-y-4">
+                <input id="inp-name" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="ชื่อลูกค้า" required>
+                <input id="inp-phone" type="tel" class="w-full p-3.5 bg-slate-50 border rounded-xl" placeholder="เบอร์โทร">
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="inp-pax" class="w-full p-3.5 bg-slate-50 border rounded-xl"><option value="1">1 ท่าน</option><option value="2">2 ท่าน</option><option value="3+">3+ ท่าน</option></select>
+                    <input id="inp-time" type="time" class="w-full p-3.5 bg-slate-50 border rounded-xl text-center" required>
+                </div>
+                <button class="btn-gradient w-full py-4 rounded-xl font-bold text-lg shadow-lg mt-4">กดรับบัตรคิว</button>
+            </form>
+        </div>
+        <div id="ticket-section" class="hidden glass-card p-8 text-center animate__animated animate__zoomIn">
+            <div class="text-xs text-slate-400 uppercase tracking-widest mb-2">หมายเลขคิวของคุณ</div>
+            <div id="my-q-num" class="text-7xl font-black text-slate-800 mb-2">---</div>
+            <div id="queue-ahead-box" class="bg-orange-50 border border-orange-100 px-4 py-2 rounded-lg mb-6"><span class="text-xs font-bold text-orange-600">มีคิวรอ <span id="ahead-count">0</span> คิว</span></div>
+            <div class="text-left text-sm mb-4"><span class="text-slate-400">ชื่อ:</span> <span id="my-name" class="font-bold">...</span></div>
+            <button onclick="App.testSound()" class="w-full py-3 rounded-xl bg-slate-100 text-slate-600 font-bold mb-3">🔊 ทดสอบเสียง</button>
+            <button onclick="App.cancel()" class="text-sm text-red-400 underline">ยกเลิกคิว</button>
+        </div>
+    </main>
+    <script>
+        const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
+        firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+        class CustomerApp {
+            constructor(){this.myId=localStorage.getItem('q_id'); this.init();}
+            init(){
+                if(this.myId) this.listenTicket(); 
+                db.collection('q_system').doc('config').onSnapshot(d=>{
+                    if(d.exists){ document.getElementById('current-q').innerText=d.data().current||'---'; document.getElementById('shop-name').innerText=d.data().shopName||'{{SHOP_NAME}}'; }
+                });
             }
-        };
+            listenTicket(){
+                db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(d=>{
+                    if(!d.exists) return localStorage.removeItem('q_id'),location.reload();
+                    const dat=d.data();
+                    if(dat.status==='served') Swal.fire('เสร็จสิ้น','ขอบคุณที่ใช้บริการ','success').then(()=>this.logout());
+                    else {
+                        document.getElementById('form-section').classList.add('hidden');
+                        document.getElementById('ticket-section').classList.remove('hidden');
+                        document.getElementById('my-q-num').innerText=dat.number;
+                        document.getElementById('my-name').innerText=dat.name;
+                        if(dat.status==='called') { 
+                            if(navigator.vibrate) navigator.vibrate(500); 
+                            Swal.fire({title:'ถึงคิวคุณแล้ว',timer:2000,showConfirmButton:false});
+                            this.speak(dat.voiceMessage);
+                        }
+                    }
+                });
+            }
+            async book(e){
+                e.preventDefault(); const btn=e.target.querySelector('button'); btn.disabled=true;
+                try{
+                    await db.runTransaction(async t=>{
+                        const ref=db.collection('q_system').doc('config'); const doc=await t.get(ref); const d=doc.data();
+                        const next=(d.last||0)+1; const num=(d.queuePrefix||'A-')+String(next).padStart(3,'0');
+                        const qRef=ref.collection('queues').doc();
+                        t.set(qRef,{number:num, raw:next, name:document.getElementById('inp-name').value, status:'waiting', timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+                        t.update(ref,{last:next}); localStorage.setItem('q_id',qRef.id); this.myId=qRef.id;
+                    });
+                    this.listenTicket();
+                }catch(err){ btn.disabled=false; alert(err.message); }
+            }
+            cancel(){ if(confirm('ยกเลิก?')) db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'}); }
+            logout(){ localStorage.removeItem('q_id'); location.reload(); }
+            testSound(){ this.speak('ทดสอบเสียง'); }
+            speak(t){ if('speechSynthesis' in window){ window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='th-TH'; window.speechSynthesis.speak(u); }}
+        }
+        const App=new CustomerApp();
+    <\/script>
+</body>
+</html>`;
 
-        // --- 4. AUTH & LOGIC ---
+        // 2.2 ADMIN CODE TEMPLATE
+        const RAW_ADMIN_CODE = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - {{SHOP_NAME}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>body{font-family:'Sarabun',sans-serif;background:#f1f5f9}.btn-action{padding:8px 16px;border-radius:8px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.btn-call{background:#eff6ff;color:#2563eb}.btn-done{background:#ecfdf5;color:#16a34a}</style>
+</head>
+<body class="flex h-screen">
+    <aside class="w-64 bg-white border-r p-4">
+        <h1 class="text-xl font-bold mb-6 text-blue-600">{{SHOP_NAME}}</h1>
+        <div class="space-y-2">
+            <div class="p-3 bg-blue-50 text-blue-700 rounded-lg font-bold">จัดการคิว</div>
+            <button onclick="window.Admin.resetSystem()" class="w-full text-left p-3 text-red-500 font-bold hover:bg-red-50 rounded-lg">รีเซ็ตระบบ</button>
+        </div>
+    </aside>
+    <main class="flex-1 p-8 overflow-y-auto">
+        <header class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold">คิวรอเรียก</h2>
+            <div class="text-right"><div class="text-xs text-gray-400 font-bold">Calling</div><div class="text-4xl font-black text-blue-600" id="header-current">---</div></div>
+        </header>
+        <div id="tb-live" class="space-y-3"></div>
+    </main>
+    <script>
+        const firebaseConfig = { apiKey: "{{API_KEY}}", authDomain: "{{PROJECT_ID}}.firebaseapp.com", projectId: "{{PROJECT_ID}}", storageBucket: "{{PROJECT_ID}}.firebasestorage.app", messagingSenderId: "{{SENDER_ID}}", appId: "{{APP_ID}}" };
+        firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+        class AdminApp {
+            constructor(){ 
+                this.qRef=db.collection('q_system').doc('config').collection('queues');
+                this.cRef=db.collection('q_system').doc('config');
+                this.init(); 
+            }
+            init(){
+                this.cRef.onSnapshot(d=>{ if(d.exists) document.getElementById('header-current').innerText=d.data().current||'---'; });
+                this.qRef.orderBy('timestamp','asc').onSnapshot(s=>{
+                    const active=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>['waiting','called'].includes(x.status));
+                    document.getElementById('tb-live').innerHTML = active.map(d=>\`
+                        <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center \${d.status==='called'?'border-blue-500 border-l-4':''}">
+                            <div><span class="text-2xl font-black mr-4">\${d.number}</span> <span class="font-bold">\${d.name}</span></div>
+                            <div class="flex gap-2">
+                                <button onclick="window.Admin.call('\${d.id}','\${d.number}','\${d.name}')" class="btn-action btn-call">เรียก</button>
+                                <button onclick="window.Admin.serve('\${d.id}')" class="btn-action btn-done">จบ</button>
+                            </div>
+                        </div>\`).join('') || '<div class="text-center text-gray-400">ไม่มีคิว</div>';
+                });
+            }
+            call(id,n,nm){ this.qRef.doc(id).update({status:'called',lastCallTime:Date.now(),voiceMessage:'เชิญหมายเลข '+n}); this.cRef.update({current:n}); }
+            serve(id){ this.qRef.doc(id).update({status:'served'}); }
+            resetSystem(){ if(confirm('รีเซ็ต?')) { this.cRef.update({current:'---',last:0}); this.qRef.get().then(s=>{const b=db.batch();s.docs.forEach(d=>b.delete(d.ref));b.commit()}); } }
+        }
+        window.onload=()=>window.Admin=new AdminApp();
+    <\/script>
+</body>
+</html>`;
+
+        // --- 3. APP LOGIC ---
+        let allOrders = [];
+        let currentTab = 'pending';
+
         const Auth = {
-            login: () => auth.signInWithEmailAndPassword(document.getElementById('l-email').value, document.getElementById('l-pass').value).catch(e=>Swal.fire('Error',e.message,'error')),
-            register: () => {
-                const n=document.getElementById('r-name').value, e=document.getElementById('r-email').value, p=document.getElementById('r-pass').value;
-                auth.createUserWithEmailAndPassword(e,p).then(c=>{ c.user.updateProfile({displayName:n}); Swal.fire('สำเร็จ','สมัครสมาชิกแล้ว','success'); }).catch(err=>Swal.fire('Error',err.message,'error'));
+            login: () => {
+                const e = document.getElementById('adm-email').value;
+                const p = document.getElementById('adm-pass').value;
+                auth.signInWithEmailAndPassword(e, p).then(() => {
+                    if (auth.currentUser.email !== SUPER_ADMIN_EMAIL) {
+                        Swal.fire('Access Denied', 'ไม่ใช่ Super Admin', 'error').then(() => auth.signOut());
+                    } else {
+                        document.getElementById('login-modal').classList.add('hidden');
+                    }
+                }).catch(err => Swal.fire('Error', err.message, 'error'));
             },
-            logout: () => auth.signOut().then(()=>location.reload())
+            logout: () => auth.signOut().then(() => location.reload())
         };
 
         const App = {
             init: () => {
                 auth.onAuthStateChanged(user => {
-                    View.updateNav(user);
-                    if(user) {
-                        // Load Customer View
-                        db.collection('web_orders').where('uid','==',user.uid).orderBy('timestamp','desc').onSnapshot(snap => {
-                            const orders = snap.docs.map(d=>({id:d.id, ...d.data()}));
-                            View.renderCustomerOrders(orders);
-                            if(user.email !== SUPER_ADMIN_EMAIL) View.show('customer');
-                        });
-
-                        // Load Admin View (Only if authorized)
-                        if(user.email === SUPER_ADMIN_EMAIL) {
-                            db.collection('web_orders').orderBy('timestamp','desc').onSnapshot(snap => {
-                                const orders = snap.docs.map(d=>({id:d.id, ...d.data()}));
-                                View.renderAdminTable(orders);
-                            });
-                        }
+                    if (user && user.email === SUPER_ADMIN_EMAIL) {
+                        document.getElementById('login-modal').classList.add('hidden');
+                        App.fetchOrders();
                     } else {
-                        View.show('login');
+                        document.getElementById('login-modal').classList.remove('hidden');
                     }
                 });
             },
-            createOrder: () => {
-                const u = auth.currentUser;
-                const shop = document.getElementById('ord-shop').value;
-                const admE = document.getElementById('ord-adm-email').value;
-                const admP = document.getElementById('ord-adm-pass').value;
-                if(!shop || !admE || !admP) return Swal.fire('แจ้งเตือน','กรุณากรอกข้อมูลให้ครบถ้วน','warning');
-                
-                db.collection('web_orders').add({
-                    uid: u.uid, customerName: u.displayName || u.email, shopName: shop, adminEmail: admE, adminPass: admP,
-                    status: 'pending', timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(()=> {
-                    Swal.fire('สั่งซื้อสำเร็จ','ข้อมูลถูกส่งไปยังแอดมินแล้ว','success');
-                    document.getElementById('ord-shop').value = ''; // Clear form
+
+            fetchOrders: () => {
+                db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                    allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    App.updateBadges();
+                    App.renderList();
+                    document.getElementById('loading').classList.add('hidden');
                 });
             },
-            updateStatus: (id, val) => {
-                db.collection('web_orders').doc(id).update({ status: val }).then(() => {
+
+            updateBadges: () => {
+                const pending = allOrders.filter(o => o.status === 'pending').length;
+                const working = allOrders.filter(o => ['working', 'testing'].includes(o.status)).length;
+                const b1 = document.getElementById('count-pending');
+                const b2 = document.getElementById('count-working');
+                if(pending>0){b1.innerText=pending;b1.classList.remove('hidden');}else b1.classList.add('hidden');
+                if(working>0){b2.innerText=working;b2.classList.remove('hidden');}else b2.classList.add('hidden');
+            },
+
+            switchTab: (tab) => {
+                currentTab = tab;
+                document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+                document.getElementById(`tab-${tab}`).classList.add('active');
+                document.getElementById('page-title').innerText = tab === 'pending' ? 'คำสั่งซื้อใหม่' : (tab === 'working' ? 'กำลังดำเนินการ' : 'เสร็จสิ้นแล้ว');
+                App.renderList();
+            },
+
+            renderList: () => {
+                const container = document.getElementById('order-list');
+                let filtered = [];
+                if (currentTab === 'pending') filtered = allOrders.filter(o => o.status === 'pending');
+                else if (currentTab === 'working') filtered = allOrders.filter(o => ['working', 'testing'].includes(o.status));
+                else filtered = allOrders.filter(o => o.status === 'completed');
+
+                if (filtered.length === 0) { container.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 bg-white rounded-2xl border border-dashed">ไม่มีข้อมูล</div>`; return; }
+
+                container.innerHTML = filtered.map(o => {
+                    const dataJson = encodeURIComponent(JSON.stringify(o));
+                    let actions = '';
+                    
+                    if (currentTab === 'pending') {
+                        actions = `<button onclick="App.updateStatus('${o.id}', 'working')" class="w-full py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md">กดรับงาน</button>`;
+                    } else if (currentTab === 'working') {
+                        actions = `
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="App.generateCode('${dataJson}')" class="py-2 bg-purple-100 text-purple-700 rounded-lg font-bold border border-purple-200">เจนโค้ด</button>
+                                <button onclick="App.updateStatus('${o.id}', 'completed')" class="py-2 bg-green-600 text-white rounded-lg font-bold shadow-md">เสร็จสิ้น</button>
+                            </div>`;
+                    } else {
+                        actions = `<div class="text-center text-green-600 font-bold bg-green-50 p-2 rounded-lg">ส่งมอบแล้ว</div>`;
+                    }
+
+                    return `
+                        <div class="order-card p-6 flex flex-col h-full animate__animated animate__fadeIn">
+                            <div class="flex justify-between items-start mb-4">
+                                <div><h3 class="text-lg font-bold text-gray-800">${o.shopName}</h3><div class="text-sm text-gray-500">${o.customerName}</div></div>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">${new Date(o.timestamp?.toDate()).toLocaleDateString()}</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm space-y-2 mb-6 flex-1">
+                                <div class="flex justify-between"><span class="text-gray-400">Email:</span> <span class="text-gray-700 select-all">${o.adminEmail}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400">Pass:</span> <span class="text-gray-700 select-all">${o.adminPass}</span></div>
+                            </div>
+                            <div class="mt-auto">${actions}</div>
+                        </div>`;
+                }).join('');
+            },
+
+            updateStatus: (id, status) => {
+                db.collection('web_orders').doc(id).update({ status: status }).then(() => {
                     const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500});
-                    Toast.fire({icon: 'success', title: 'อัปเดตสถานะแล้ว'});
+                    Toast.fire({icon: 'success', title: 'อัปเดตแล้ว'});
                 });
             },
-            genCode: (jsonStr) => {
+
+            generateCode: (jsonStr) => {
                 const o = JSON.parse(decodeURIComponent(jsonStr));
                 
-                // Replace logic (Demo)
-                const cCode = TPL_CLIENT.replace(/{{SHOP_NAME}}/g, o.shopName);
-                const aCode = TPL_ADMIN.replace(/{{SHOP_NAME}}/g, o.shopName).replace(/{{ADM_EMAIL}}/g, o.adminEmail).replace(/{{ADM_PASS}}/g, o.adminPass);
+                // *** FIND & REPLACE LOGIC (หัวใจสำคัญ) ***
+                let clientCode = RAW_CLIENT_CODE
+                    .replace(/{{SHOP_NAME}}/g, o.shopName)
+                    .replace(/{{API_KEY}}/g, firebaseConfig.apiKey)
+                    .replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId)
+                    .replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId)
+                    .replace(/{{APP_ID}}/g, firebaseConfig.appId);
+
+                let adminCode = RAW_ADMIN_CODE
+                    .replace(/{{SHOP_NAME}}/g, o.shopName)
+                    .replace(/{{ADM_EMAIL}}/g, o.adminEmail)
+                    .replace(/{{ADM_PASS}}/g, o.adminPass)
+                    .replace(/{{API_KEY}}/g, firebaseConfig.apiKey)
+                    .replace(/{{PROJECT_ID}}/g, firebaseConfig.projectId)
+                    .replace(/{{SENDER_ID}}/g, firebaseConfig.messagingSenderId)
+                    .replace(/{{APP_ID}}/g, firebaseConfig.appId);
 
                 Swal.fire({
-                    title: `Gen Code: ${o.shopName}`, width: '700px',
+                    title: `Gen Code: ${o.shopName}`,
+                    width: '800px',
                     html: `
                         <div class="text-left space-y-4">
                             <div>
-                                <label class="text-xs font-bold text-blue-600">Client Code</label>
-                                <textarea id="area-c" class="w-full h-20 text-[10px] font-mono border p-2 bg-slate-50 rounded">${cCode}</textarea>
-                                <button onclick="navigator.clipboard.writeText(document.getElementById('area-c').value)" class="text-xs bg-gray-200 px-2 py-1 rounded font-bold hover:bg-gray-300">Copy</button>
+                                <label class="text-xs font-bold text-blue-600 block mb-1">1. โค้ดลูกค้า (client.html)</label>
+                                <div class="relative">
+                                    <textarea id="code-client" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" readonly>${clientCode}</textarea>
+                                    <button onclick="navigator.clipboard.writeText(document.getElementById('code-client').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button>
+                                </div>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-purple-600">Admin Code</label>
-                                <textarea id="area-a" class="w-full h-20 text-[10px] font-mono border p-2 bg-slate-50 rounded">${aCode}</textarea>
-                                <button onclick="navigator.clipboard.writeText(document.getElementById('area-a').value)" class="text-xs bg-gray-200 px-2 py-1 rounded font-bold hover:bg-gray-300">Copy</button>
+                                <label class="text-xs font-bold text-purple-600 block mb-1">2. โค้ดแอดมิน (admin.html)</label>
+                                <div class="relative">
+                                    <textarea id="code-admin" class="w-full h-32 text-[10px] font-mono border bg-slate-50 rounded p-2 focus:ring-2 focus:ring-purple-500 outline-none" readonly>${adminCode}</textarea>
+                                    <button onclick="navigator.clipboard.writeText(document.getElementById('code-admin').value)" class="absolute top-2 right-2 bg-white border px-3 py-1 rounded text-xs font-bold hover:bg-gray-50">Copy</button>
+                                </div>
                             </div>
-                        </div>`,
+                        </div>
+                    `,
                     showConfirmButton: false, showCloseButton: true
                 });
             }
