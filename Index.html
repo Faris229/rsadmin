@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin | จัดการออเดอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>body{font-family:'Kanit',sans-serif;background:#f3f4f6;}</style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-crown"></i></div>
+            <h1 class="font-bold text-xl text-gray-800">Super Admin Panel</h1>
+        </div>
+        <button onclick="firebase.auth().signOut()" class="text-sm font-bold text-gray-500 hover:text-red-500">Log Out</button>
+    </div>
+
+    <div class="max-w-6xl mx-auto p-8">
+        <div id="login-modal" class="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-xl w-96 text-center">
+                <h2 class="font-bold text-xl mb-4">ยืนยันตัวตนแอดมิน</h2>
+                <input id="adm-email" class="w-full border p-3 rounded mb-2" placeholder="Email">
+                <input id="adm-pass" type="password" class="w-full border p-3 rounded mb-4" placeholder="Password">
+                <button onclick="Admin.login()" class="w-full bg-purple-600 text-white p-3 rounded font-bold">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-500 text-sm border-b">
+                    <tr>
+                        <th class="p-4">วันที่</th>
+                        <th class="p-4">ลูกค้า</th>
+                        <th class="p-4">ข้อมูลร้าน (Input)</th>
+                        <th class="p-4">สถานะ</th>
+                        <th class="p-4 text-center">Tools</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list" class="divide-y divide-gray-100 text-sm"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
+            authDomain: "rsdm-9ca2a.firebaseapp.com",
+            projectId: "rsdm-9ca2a",
+            storageBucket: "rsdm-9ca2a.firebasestorage.app",
+            messagingSenderId: "299212700124",
+            appId: "1:299212700124:web:730160dae6bb1b09cbb719"
+        };
+        const SUPER_ADMIN_EMAIL = "admin@rsdm.com"; // ** เปลี่ยนเป็นอีเมลคุณ **
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Template โค้ดที่จะเจน (ย่อไว้เป็นตัวอย่าง)
+        const CODE_TEMPLATES = {
+            client: `\n<!DOCTYPE html>\n<html>... (Client Code) ...\n<script>document.getElementById('shop-name').innerText="{{SHOP_NAME}}";<\/script>\n</html>`,
+            admin: `\n\n<!DOCTYPE html>\n<html>... (Admin Code) ...\n</html>`
+        };
+
+        const Admin = {
+            login: () => {
+                const e = document.getElementById('adm-email').value;
+                const p = document.getElementById('adm-pass').value;
+                auth.signInWithEmailAndPassword(e,p).then(()=>{
+                    if(auth.currentUser.email !== SUPER_ADMIN_EMAIL) {
+                        alert("ไม่ใช่ Super Admin"); auth.signOut();
+                    }
+                }).catch(e=>alert(e.message));
+            },
+            loadOrders: () => {
+                db.collection('web_orders').orderBy('timestamp','desc').onSnapshot(snap => {
+                    const tbody = document.getElementById('order-list');
+                    tbody.innerHTML = snap.docs.map(doc => {
+                        const d = doc.data();
+                        const objStr = encodeURIComponent(JSON.stringify(d));
+                        const statusOpts = ['pending','working','testing','completed'].map(s => 
+                            `<option value="${s}" ${d.status===s?'selected':''}>${s.toUpperCase()}</option>`
+                        ).join('');
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-4 text-gray-400">${new Date(d.timestamp.toDate()).toLocaleDateString()}</td>
+                                <td class="p-4 font-bold">${d.customerName}</td>
+                                <td class="p-4">
+                                    <div class="font-bold text-blue-600">${d.shopName}</div>
+                                    <div class="text-xs text-gray-400">U: ${d.adminEmail} | P: ${d.adminPass}</div>
+                                </td>
+                                <td class="p-4">
+                                    <select onchange="Admin.updateStatus('${doc.id}',this.value)" class="border rounded p-1 bg-white text-xs font-bold cursor-pointer outline-none ${d.status==='completed'?'text-green-600 border-green-200':''}">
+                                        ${statusOpts}
+                                    </select>
+                                </td>
+                                <td class="p-4 text-center">
+                                    <button onclick="Admin.genCode('${objStr}')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-purple-700 shadow">
+                                        <i class="fa-solid fa-code mr-1"></i> เจนโค้ด
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                });
+            },
+            updateStatus: (id, val) => {
+                db.collection('web_orders').doc(id).update({status: val});
+            },
+            genCode: (str) => {
+                const d = JSON.parse(decodeURIComponent(str));
+                
+                // แทนที่ข้อมูล
+                const cCode = CODE_TEMPLATES.client.replace(/{{SHOP_NAME}}/g, d.shopName);
+                const aCode = CODE_TEMPLATES.admin.replace(/{{SHOP_NAME}}/g, d.shopName).replace(/{{ADM_EMAIL}}/g, d.adminEmail).replace(/{{ADM_PASS}}/g, d.adminPass);
+
+                Swal.fire({
+                    title: `Gen Code: ${d.shopName}`,
+                    width: 700,
+                    html: `
+                        <div class="text-left space-y-3">
+                            <label class="font-bold text-xs text-blue-600">Client Code</label>
+                            <textarea id="tc" class="w-full h-24 text-[10px] font-mono border p-2 bg-slate-50">${cCode}</textarea>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('tc').value)" class="text-xs bg-gray-200 px-2 py-1 rounded">Copy</button>
+                            
+                            <label class="font-bold text-xs text-purple-600 mt-2 block">Admin Code</label>
+                            <textarea id="ta" class="w-full h-24 text-[10px] font-mono border p-2 bg-slate-50">${aCode}</textarea>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('ta').value)" class="text-xs bg-gray-200 px-2 py-1 rounded">Copy</button>
+                        </div>
+                    `,
+                    showConfirmButton: false
+                });
+            }
+        };
+
+        auth.onAuthStateChanged(user => {
+            if(user && user.email === SUPER_ADMIN_EMAIL) {
+                document.getElementById('login-modal').classList.add('hidden');
+                Admin.loadOrders();
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
