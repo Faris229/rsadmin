@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Management</title>
-    
+    <title>Admin Panel | Game Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,132 +13,105 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f8f9fa; }
-        .sidebar { width: 260px; height: 100vh; background: #fff; border-right: 1px solid #eee; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 20px; }
-        .main-content { margin-left: 260px; padding: 40px; }
-        
-        .stat-card { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #eee; }
-        .table-container { background: #fff; border-radius: 16px; border: 1px solid #eee; overflow: hidden; margin-top: 30px; }
-        
-        .btn-status { font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer; transition: 0.2s; }
-        .btn-status:hover { background: #f0f0f0; }
-        .btn-status.active { background: #000; color: #fff; border-color: #000; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal-box { background: #fff; width: 100%; max-width: 500px; padding: 30px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        body { font-family: 'Prompt', sans-serif; background: #f9fafb; color: #1f2937; }
+        .sidebar { width: 250px; background: white; height: 100vh; position: fixed; border-right: 1px solid #e5e7eb; padding: 20px; }
+        .content { margin-left: 250px; padding: 30px; }
+        .input-adm { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 10px; }
+        .btn-adm { background: #000; color: #fff; padding: 10px 20px; border-radius: 8px; width: 100%; font-weight: bold; }
+        .menu-item { display: block; padding: 12px; border-radius: 8px; color: #4b5563; transition: 0.2s; cursor: pointer; }
+        .menu-item:hover, .menu-item.active { background: #000; color: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay" class="fixed inset-0 bg-white z-[999] flex items-center justify-center">
+    <div id="login-view" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
         <div class="w-80 text-center">
-            <h2 class="text-2xl font-bold mb-6">Admin Access</h2>
-            <input id="adm-email" value="faris@gmail.com" class="w-full p-3 bg-gray-50 border rounded-lg mb-3 text-center" placeholder="Email">
-            <input id="adm-pass" type="password" class="w-full p-3 bg-gray-50 border rounded-lg mb-4 text-center" placeholder="Password">
-            <button onclick="AdminAuth.login()" class="w-full bg-black text-white py-3 rounded-lg font-bold">เข้าสู่ระบบ</button>
+            <h2 class="text-2xl font-bold mb-4">Admin Access</h2>
+            <input id="adm-email" value="faris@gmail.com" class="input-adm text-center" placeholder="Email">
+            <input id="adm-pass" type="password" class="input-adm text-center" placeholder="Password">
+            <button onclick="Admin.login()" class="btn-adm">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <aside class="sidebar">
-        <div class="font-bold text-2xl tracking-tighter mb-10 flex items-center gap-3">
-            <i class="fa-solid fa-cube"></i> Admin.
+    <div class="sidebar flex flex-col justify-between">
+        <div>
+            <div class="font-bold text-2xl mb-8 flex items-center gap-2"><i class="fa-solid fa-crown"></i> Admin.</div>
+            <nav class="space-y-2">
+                <a onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item active"><i class="fa-solid fa-gamepad mr-2"></i> จัดการห้อง</a>
+                <a onclick="UI.tab('users')" id="tab-users" class="menu-item"><i class="fa-solid fa-users mr-2"></i> ผู้เล่น/เครดิต</a>
+                <a onclick="UI.tab('settings')" id="tab-settings" class="menu-item"><i class="fa-solid fa-sliders mr-2"></i> ตั้งค่าเว็บ</a>
+            </nav>
         </div>
-        <nav class="flex-1 space-y-2">
-            <a href="#" class="block p-3 bg-black text-white rounded-lg font-bold"><i class="fa-solid fa-chart-pie mr-2"></i> ภาพรวม</a>
-            <a href="#" onclick="UI.toggleAnncModal()" class="block p-3 text-gray-500 hover:bg-gray-50 rounded-lg font-bold"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</a>
-        </nav>
-        <button onclick="AdminAuth.logout()" class="text-red-500 font-bold text-sm text-left hover:underline">ออกจากระบบ</button>
-    </aside>
-
-    <div class="main-content">
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold">Dashboard</h1>
-                <p class="text-gray-400">ภาพรวมคำสั่งซื้อทั้งหมด</p>
-            </div>
-            <div class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> Online
-            </div>
-        </header>
-
-        <div class="grid grid-cols-4 gap-6">
-            <div class="stat-card">
-                <div class="text-xs font-bold text-gray-400 uppercase mb-2">งานใหม่ (Pending)</div>
-                <div id="count-pending" class="text-4xl font-bold">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="text-xs font-bold text-gray-400 uppercase mb-2">กำลังทำ (Active)</div>
-                <div id="count-active" class="text-4xl font-bold text-blue-600">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="text-xs font-bold text-gray-400 uppercase mb-2">เสร็จสิ้น (Done)</div>
-                <div id="count-done" class="text-4xl font-bold text-green-600">0</div>
-            </div>
-            <div class="stat-card bg-black text-white border-black">
-                <div class="text-xs font-bold text-gray-400 uppercase mb-2">รวมทั้งหมด</div>
-                <div id="count-total" class="text-4xl font-bold">0</div>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table class="w-full text-left">
-                <thead class="bg-gray-50 text-xs font-bold uppercase text-gray-500 border-b border-gray-100">
-                    <tr>
-                        <th class="p-5 pl-8">โปรเจกต์</th>
-                        <th class="p-5">ลูกค้า</th>
-                        <th class="p-5">สถานะ</th>
-                        <th class="p-5">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body" class="divide-y divide-gray-100 text-sm">
-                    <tr><td colspan="4" class="p-10 text-center text-gray-400">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <button onclick="auth.signOut()" class="text-red-500 font-bold text-left">Log Out</button>
     </div>
 
-    <div id="modal-manage" class="modal-overlay">
-        <div class="modal-box">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-xl" id="m-shop">Shop Name</h3>
-                <button onclick="UI.closeModal()" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div class="content">
+        <div id="view-rooms">
+            <h2 class="text-2xl font-bold mb-6">สร้างห้องเกม</h2>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 grid grid-cols-2 gap-4 mb-8 shadow-sm">
+                <input id="c-name" class="input-adm" placeholder="ชื่อห้อง">
+                <input id="c-pass" class="input-adm" placeholder="รหัสผ่านห้อง">
+                <select id="c-type" class="input-adm">
+                    <option value="rps">เป่ายิ้งฉุบ (RPS)</option>
+                    <option value="xo">เอ็กซ์โอ (XO)</option>
+                </select>
+                <div class="grid grid-cols-2 gap-4">
+                    <input id="c-bet" type="number" class="input-adm" placeholder="เดิมพัน">
+                    <input id="c-win" type="number" class="input-adm" placeholder="ชนะกี่ตา" value="3">
+                </div>
+                <button onclick="Admin.createRoom()" class="btn-adm col-span-2">สร้างห้อง</button>
             </div>
             
-            <div class="space-y-6">
-                <div>
-                    <label class="text-xs font-bold text-gray-400 uppercase block mb-2">เปลี่ยนสถานะ</label>
-                    <div class="flex flex-wrap gap-2" id="status-btns"></div>
-                </div>
+            <h3 class="font-bold mb-4 text-lg">ห้องที่เปิดอยู่</h3>
+            <div id="room-list" class="grid grid-cols-2 gap-4"></div>
+        </div>
 
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <label class="text-xs font-bold text-gray-400 uppercase block mb-3"><i class="fa-solid fa-key"></i> ข้อมูลเข้าใช้งาน (ส่งให้ลูกค้า)</label>
-                    <input id="m-user" class="w-full p-2 border rounded mb-2 text-sm" placeholder="Username / Email">
-                    <input id="m-pass" class="w-full p-2 border rounded mb-2 text-sm" placeholder="Password">
-                    <button onclick="AdminLogic.saveSecret()" class="w-full bg-black text-white py-2 rounded text-xs font-bold uppercase hover:opacity-80">บันทึกข้อมูลลับ</button>
-                </div>
-
-                <button onclick="AdminLogic.deleteOrder()" class="text-red-500 text-xs font-bold hover:underline">ลบคำสั่งซื้อนี้</button>
+        <div id="view-users" class="hidden">
+            <h2 class="text-2xl font-bold mb-6">จัดการเครดิตผู้เล่น</h2>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-4">User</th><th class="p-4">Credit</th><th class="p-4">Manage</th></tr>
+                    </thead>
+                    <tbody id="user-list"></tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <div id="modal-annc" class="modal-overlay">
-        <div class="modal-box">
-            <h3 class="font-bold text-xl mb-4">ประกาศหน้าเว็บ</h3>
-            <input id="annc-title" class="w-full p-3 border rounded-lg mb-3" placeholder="หัวข้อประกาศ">
-            <textarea id="annc-msg" class="w-full p-3 border rounded-lg h-24 mb-3 resize-none" placeholder="รายละเอียด..."></textarea>
-            <div class="flex items-center gap-2 mb-6">
-                <input type="checkbox" id="annc-active"> <label for="annc-active" class="text-sm">แสดงผลทันที</label>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="UI.toggleAnncModal()" class="flex-1 py-3 bg-gray-100 rounded-lg font-bold">ปิด</button>
-                <button onclick="AdminLogic.saveAnnc()" class="flex-1 py-3 bg-black text-white rounded-lg font-bold">บันทึก</button>
+        <div id="view-settings" class="hidden">
+            <h2 class="text-2xl font-bold mb-6">ตั้งค่าระบบเว็บ</h2>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-2xl space-y-4">
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                    <div>
+                        <div class="font-bold">สถานะเว็บไซต์</div>
+                        <div class="text-xs text-gray-500">ปิดเพื่อปรับปรุงระบบ (ลูกค้าจะเข้าไม่ได้)</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="set-status" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="font-bold text-sm">ชื่อเว็บไซต์</label>
+                    <input id="set-name" class="input-adm" placeholder="เช่น Game Zone 888">
+                </div>
+                <div>
+                    <label class="font-bold text-sm">ลิงก์ Facebook (สำหรับติดต่อ)</label>
+                    <input id="set-fb" class="input-adm" placeholder="https://m.me/...">
+                </div>
+                <div>
+                    <label class="font-bold text-sm">กฎกติกา (แสดงหน้าแรก)</label>
+                    <textarea id="set-rules" class="input-adm h-32" placeholder="ใส่กฎการเล่น..."></textarea>
+                </div>
+                
+                <button onclick="Admin.saveSettings()" class="btn-adm bg-blue-600 hover:bg-blue-700">บันทึกการตั้งค่า</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
             authDomain: "rsdm-9ca2a.firebaseapp.com",
@@ -152,123 +124,96 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let currentId = null;
+        const UI = {
+            tab: (id) => {
+                ['rooms','users','settings'].forEach(t => {
+                    document.getElementById(`view-${t}`).classList.add('hidden');
+                    document.getElementById(`tab-${t}`).classList.remove('active');
+                });
+                document.getElementById(`view-${id}`).classList.remove('hidden');
+                document.getElementById(`tab-${id}`).classList.add('active');
+            }
+        };
 
-        // AUTH
-        const AdminAuth = {
+        const Admin = {
             login: () => {
                 const e = document.getElementById('adm-email').value;
                 const p = document.getElementById('adm-pass').value;
-                firebase.auth().signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+                auth.signInWithEmailAndPassword(e, p).catch(e => alert(e.message));
             },
-            logout: () => auth.signOut()
+            createRoom: () => {
+                const name = document.getElementById('c-name').value;
+                const pass = document.getElementById('c-pass').value;
+                const type = document.getElementById('c-type').value;
+                const bet = parseInt(document.getElementById('c-bet').value);
+                const win = parseInt(document.getElementById('c-win').value);
+                
+                if(!name || !pass) return alert('กรอกข้อมูลให้ครบ');
+
+                db.collection('rooms').add({
+                    roomName: name, password: pass, gameType: type, betAmount: bet, maxWins: win,
+                    players: [], status: 'waiting', scores: {}, board: Array(9).fill(null), moves: {},
+                    roundState: 'idle', // For RPS timer
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert('สร้างห้องสำเร็จ');
+            },
+            deleteRoom: (id) => db.collection('rooms').doc(id).delete(),
+            manageCredit: (uid, amt) => db.collection('users').doc(uid).update({ credit: firebase.firestore.FieldValue.increment(amt) }),
+            
+            // Settings Logic
+            loadSettings: () => {
+                db.collection('config').doc('settings').onSnapshot(doc => {
+                    if(doc.exists) {
+                        const d = doc.data();
+                        document.getElementById('set-name').value = d.siteName || '';
+                        document.getElementById('set-fb').value = d.fbLink || '';
+                        document.getElementById('set-rules').value = d.rules || '';
+                        document.getElementById('set-status').checked = d.isOpen !== false; // Default true
+                    }
+                });
+            },
+            saveSettings: () => {
+                db.collection('config').doc('settings').set({
+                    siteName: document.getElementById('set-name').value,
+                    fbLink: document.getElementById('set-fb').value,
+                    rules: document.getElementById('set-rules').value,
+                    isOpen: document.getElementById('set-status').checked
+                }, { merge: true });
+                alert('บันทึกการตั้งค่าแล้ว');
+            }
         };
 
+        // Init
         auth.onAuthStateChanged(user => {
             if(user && user.email === 'faris@gmail.com') {
-                document.getElementById('login-overlay').classList.add('hidden');
-                AdminLogic.loadData();
+                document.getElementById('login-view').classList.add('hidden');
+                
+                // Load Realtime Data
+                db.collection('rooms').onSnapshot(snap => {
+                    const el = document.getElementById('room-list');
+                    el.innerHTML = snap.docs.map(doc => {
+                        const r = doc.data();
+                        return `<div class="bg-white p-4 rounded-lg border flex justify-between items-center">
+                            <div><div class="font-bold">${r.roomName} (${r.gameType})</div><div class="text-xs text-gray-500">Pass: ${r.password} | Bet: ${r.betAmount}</div></div>
+                            <button onclick="Admin.deleteRoom('${doc.id}')" class="text-red-500 font-bold text-xs">ลบ</button>
+                        </div>`;
+                    }).join('');
+                });
+
+                db.collection('users').onSnapshot(snap => {
+                    const el = document.getElementById('user-list');
+                    el.innerHTML = snap.docs.map(doc => {
+                        const u = doc.data();
+                        return `<tr class="border-b hover:bg-gray-50"><td class="p-4">${u.nickname}<br><span class="text-xs text-gray-400">${u.email}</span></td><td class="p-4 font-bold">${u.credit}</td><td class="p-4 flex gap-2"><button onclick="Admin.manageCredit('${doc.id}',100)" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">+100</button><button onclick="Admin.manageCredit('${doc.id}',-100)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">-100</button></td></tr>`;
+                    }).join('');
+                });
+
+                Admin.loadSettings();
             } else {
-                document.getElementById('login-overlay').classList.remove('hidden');
+                document.getElementById('login-view').classList.remove('hidden');
             }
         });
-
-        // UI & LOGIC
-        const UI = {
-            openManager: (id, shop, status, u, p) => {
-                currentId = id;
-                document.getElementById('modal-manage').style.display = 'flex';
-                document.getElementById('m-shop').innerText = shop;
-                document.getElementById('m-user').value = u || '';
-                document.getElementById('m-pass').value = p || '';
-                
-                // Gen Status Buttons
-                const statuses = ['pending', 'working', 'testing', 'completed', 'cancelled'];
-                const container = document.getElementById('status-btns');
-                container.innerHTML = statuses.map(s => 
-                    `<button onclick="AdminLogic.setStatus('${s}')" class="btn-status ${status === s ? 'active' : ''}">${s}</button>`
-                ).join('');
-            },
-            closeModal: () => {
-                document.getElementById('modal-manage').style.display = 'none';
-                currentId = null;
-            },
-            toggleAnncModal: () => {
-                const el = document.getElementById('modal-annc');
-                el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
-            }
-        };
-
-        const AdminLogic = {
-            loadData: () => {
-                db.collection('web_orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                    const tbody = document.getElementById('table-body');
-                    let p=0, a=0, d=0;
-
-                    if(snap.empty) { tbody.innerHTML = `<tr><td colspan="4" class="p-10 text-center">ไม่มีข้อมูล</td></tr>`; return; }
-                    
-                    tbody.innerHTML = snap.docs.map(doc => {
-                        const data = doc.data();
-                        
-                        // Count Stats
-                        if(data.status === 'pending') p++;
-                        if(['working','testing'].includes(data.status)) a++;
-                        if(data.status === 'completed') d++;
-
-                        // Color
-                        let color = 'bg-gray-100 text-gray-500';
-                        if(data.status === 'working') color = 'bg-blue-100 text-blue-600';
-                        if(data.status === 'completed') color = 'bg-green-100 text-green-600';
-                        if(data.status === 'cancelled') color = 'bg-red-100 text-red-600';
-
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="p-5 pl-8 font-bold">${data.shopName}</td>
-                                <td class="p-5 text-gray-500">${data.customerName}<br><span class="text-xs text-gray-300">${data.uid.slice(0,5)}...</span></td>
-                                <td class="p-5"><span class="px-3 py-1 rounded text-xs font-bold uppercase ${color}">${data.status}</span></td>
-                                <td class="p-5">
-                                    <button onclick="UI.openManager('${doc.id}', '${data.shopName}', '${data.status}', '${data.adminEmail||''}', '${data.adminPass||''}')" class="bg-black text-white px-4 py-2 rounded font-bold text-xs hover:opacity-80">จัดการ</button>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-
-                    document.getElementById('count-pending').innerText = p;
-                    document.getElementById('count-active').innerText = a;
-                    document.getElementById('count-done').innerText = d;
-                    document.getElementById('count-total').innerText = snap.size;
-                });
-            },
-            setStatus: async (s) => {
-                if(!currentId) return;
-                await db.collection('web_orders').doc(currentId).update({ status: s });
-                // Refresh modal UI manually simply by re-opening or just leave it open to see update in background
-                UI.closeModal(); // Close to show list update
-            },
-            saveSecret: async () => {
-                if(!currentId) return;
-                const u = document.getElementById('m-user').value;
-                const p = document.getElementById('m-pass').value;
-                await db.collection('web_orders').doc(currentId).update({ adminEmail: u, adminPass: p });
-                alert('Saved!');
-            },
-            deleteOrder: async () => {
-                if(confirm('Delete this order?')) {
-                    await db.collection('web_orders').doc(currentId).delete();
-                    UI.closeModal();
-                }
-            },
-            saveAnnc: async () => {
-                const t = document.getElementById('annc-title').value;
-                const m = document.getElementById('annc-msg').value;
-                const a = document.getElementById('annc-active').checked;
-                await db.collection('system_announcements').doc('main').set({
-                    title: t, message: m, isActive: a
-                });
-                alert('Updated Announcement');
-                UI.toggleAnncModal();
-            }
-        };
     </script>
 </body>
 </html>
