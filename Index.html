@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE | Ultimate</title>
+    <title>ADMIN CENTER | ZONE.</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -19,294 +19,141 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Prompt', 'sans-serif'], display: ['Outfit', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            dark: '#020617',
-                            card: '#0f172a',
-                            accent: '#6366f1',
-                            success: '#10b981',
-                            warning: '#f59e0b',
-                            danger: '#ef4444'
-                        }
-                    },
-                    animation: { 'pulse-slow': 'pulse 3s infinite' }
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                    colors: { dark: '#020617', card: '#0f172a', accent: '#6366f1' }
                 }
             }
         }
     </script>
-
     <style>
-        body { background-color: #020617; color: #cbd5e1; overflow-x: hidden; }
-        
-        /* Backgrounds */
-        .bg-grid {
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px; position: fixed; inset: 0; z-index: -2;
-        }
-        .bg-orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; animation: blob 10s infinite alternate; }
-        .bg-orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(99, 102, 241, 0.1); }
-        .bg-orb-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: rgba(244, 63, 94, 0.1); }
-
-        @keyframes blob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(20px, -20px) scale(1.1); }
-        }
-
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .glass-card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            border-color: #6366f1;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.2);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px; height: 100vh; position: fixed; left: 0; top: 0;
-            background: #0b1121; border-right: 1px solid #1e293b;
-            z-index: 50; display: flex; flex-direction: column;
-        }
-        
-        .menu-item {
-            display: flex; items-center; gap: 12px; padding: 14px 20px;
-            border-radius: 12px; color: #94a3b8; transition: 0.3s;
-            cursor: pointer; margin-bottom: 5px; font-weight: 500;
-        }
-        .menu-item:hover, .menu-item.active {
-            background: rgba(99, 102, 241, 0.1);
-            color: #fff;
-            border-left: 4px solid #6366f1;
-        }
-
-        /* Content Area */
-        .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
-        
-        /* Inputs */
-        .input-admin {
-            width: 100%; background: #1e293b; border: 1px solid #334155;
-            padding: 10px 14px; border-radius: 10px; color: white; outline: none; transition: 0.3s;
-        }
-        .input-admin:focus { border-color: #6366f1; background: #0f172a; }
-
-        /* Tables */
-        table { width: 100%; text-align: left; border-collapse: separate; border-spacing: 0; }
-        th { text-transform: uppercase; font-size: 0.75rem; color: #64748b; padding: 16px; font-weight: 700; border-bottom: 1px solid #1e293b; }
-        td { padding: 16px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; }
-        .modal-box { background: #0f172a; border: 1px solid #334155; width: 100%; max-width: 500px; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        body { background-color: #020617; color: #cbd5e1; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; background: #0b1121; border-right: 1px solid #1e293b; z-index: 50; }
+        .content { margin-left: 260px; padding: 40px; }
+        .menu-item { padding: 12px 20px; border-radius: 10px; cursor: pointer; transition: 0.3s; color: #94a3b8; display: flex; items-center; gap: 10px; margin-bottom: 5px; }
+        .menu-item:hover, .menu-item.active { background: rgba(99, 102, 241, 0.1); color: #fff; border-left: 4px solid #6366f1; }
+        input, select, textarea { width: 100%; background: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 8px; color: white; outline: none; }
+        input:focus { border-color: #6366f1; }
+        th { text-align: left; padding: 15px; color: #64748b; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #1e293b; }
+        td { padding: 15px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #0f172a; width: 100%; max-width: 500px; padding: 30px; border-radius: 20px; border: 1px solid #334155; }
     </style>
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans">
 
-    <div class="bg-grid"></div>
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-
-    <div id="login-overlay" class="fixed inset-0 z-[200] bg-[#020617] flex items-center justify-center p-4">
-        <div class="w-full max-w-sm text-center animate__animated animate__fadeInDown">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-500/10 rounded-full mb-6 border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
-                <i class="fa-solid fa-user-shield text-4xl text-indigo-500"></i>
-            </div>
-            <h1 class="text-4xl font-black font-display text-white mb-2 tracking-tight">ADMIN CONSOLE</h1>
-            <p class="text-slate-500 mb-8 text-sm uppercase tracking-widest">Authorized Access Only</p>
-            
-            <div class="glass-card p-8 space-y-4 text-left">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">Email</label>
-                    <input id="login-email" class="input-admin mt-1 text-center" placeholder="admin@zone.com">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">Password</label>
-                    <input id="login-pass" type="password" class="input-admin mt-1 text-center" placeholder="••••••••">
-                </div>
-                <button onclick="AdminAuth()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-900/50 transition transform hover:scale-[1.02]">
-                    LOGIN SYSTEM
-                </button>
-            </div>
+    <div id="login-view" class="fixed inset-0 z-[200] bg-[#020617] flex items-center justify-center p-4">
+        <div class="w-full max-w-sm glass p-8 text-center animate__animated animate__fadeInDown">
+            <h1 class="text-3xl font-bold text-white mb-2">ADMIN OP</h1>
+            <p class="text-slate-500 mb-6 text-sm">เข้าสู่ระบบจัดการหลังบ้าน</p>
+            <input id="a-email" class="mb-3 text-center" placeholder="Email">
+            <input id="a-pass" type="password" class="mb-6 text-center" placeholder="Password">
+            <button onclick="Admin.login()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <div id="admin-interface" class="hidden flex">
-        
-        <aside class="sidebar p-6">
-            <div class="flex items-center gap-3 mb-10 px-2">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">Z</div>
-                <div>
-                    <div class="font-bold text-xl font-display tracking-wider">ZONE.</div>
-                    <div class="text-[10px] text-green-400 tracking-widest font-bold animate-pulse">● ONLINE</div>
-                </div>
-            </div>
-
-            <nav class="flex-1 space-y-1">
-                <div onclick="UI.switchTab('dash')" id="nav-dash" class="menu-item active">
-                    <i class="fa-solid fa-chart-pie text-blue-400"></i> แดชบอร์ด
-                </div>
-                <div onclick="UI.switchTab('requests')" id="nav-requests" class="menu-item justify-between">
-                    <div class="flex items-center gap-3"><i class="fa-solid fa-bell text-yellow-400"></i> คำขอฝาก/ถอน</div>
-                    <span id="badge-req" class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-                </div>
-                <div onclick="UI.switchTab('rooms')" id="nav-rooms" class="menu-item">
-                    <i class="fa-solid fa-gamepad text-purple-400"></i> ห้องเกม
-                </div>
-                <div onclick="UI.switchTab('users')" id="nav-users" class="menu-item">
-                    <i class="fa-solid fa-users text-pink-400"></i> ผู้เล่น
-                </div>
-                <div onclick="UI.switchTab('settings')" id="nav-settings" class="menu-item">
-                    <i class="fa-solid fa-sliders text-slate-400"></i> ตั้งค่าเว็บ
-                </div>
+    <div id="admin-view" class="hidden flex">
+        <aside class="sidebar p-6 flex flex-col">
+            <h1 class="text-2xl font-bold text-indigo-400 mb-10 px-2">ZONE ADMIN</h1>
+            <nav class="flex-1">
+                <div onclick="UI.tab('dash')" id="tab-dash" class="menu-item active"><i class="fa-solid fa-chart-pie"></i> แดชบอร์ด</div>
+                <div onclick="UI.tab('req')" id="tab-req" class="menu-item"><i class="fa-solid fa-bell text-yellow-400"></i> ฝาก/ถอน <span id="badge-req" class="ml-auto bg-red-500 text-white text-[10px] px-2 rounded-full hidden">0</span></div>
+                <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad text-purple-400"></i> ห้องเกม</div>
+                <div onclick="UI.tab('users')" id="tab-users" class="menu-item"><i class="fa-solid fa-users text-pink-400"></i> ผู้เล่น</div>
+                <div onclick="UI.tab('set')" id="tab-set" class="menu-item"><i class="fa-solid fa-sliders text-slate-400"></i> ตั้งค่าเว็บ</div>
             </nav>
-
-            <button onclick="auth.signOut()" class="bg-white/5 hover:bg-red-500/20 text-red-400 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 mt-auto">
-                <i class="fa-solid fa-power-off"></i> LOGOUT
-            </button>
+            <button onclick="firebase.auth().signOut()" class="bg-red-500/10 text-red-400 py-3 rounded-xl hover:bg-red-500 hover:text-white transition font-bold">LOGOUT</button>
         </aside>
 
-        <main class="main-content w-full">
-            
-            <div id="tab-dash" class="animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold mb-6 font-display">DASHBOARD</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-card p-6 border-l-4 border-blue-500">
-                        <div class="text-slate-400 text-xs font-bold uppercase mb-2">Total Users</div>
-                        <div class="text-4xl font-bold" id="st-users">0</div>
-                    </div>
-                    <div class="glass-card p-6 border-l-4 border-yellow-500">
-                        <div class="text-slate-400 text-xs font-bold uppercase mb-2">Pending Requests</div>
-                        <div class="text-4xl font-bold text-yellow-400" id="st-pending">0</div>
-                    </div>
-                    <div class="glass-card p-6 border-l-4 border-purple-500">
-                        <div class="text-slate-400 text-xs font-bold uppercase mb-2">Active Rooms</div>
-                        <div class="text-4xl font-bold text-purple-400" id="st-rooms">0</div>
-                    </div>
+        <main class="content w-full">
+            <div id="page-dash">
+                <h2 class="text-3xl font-bold mb-6">ภาพรวมระบบ</h2>
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="glass p-6"><div class="text-slate-400 text-xs uppercase">ผู้เล่นทั้งหมด</div><div class="text-3xl font-bold" id="st-users">0</div></div>
+                    <div class="glass p-6 border-l-4 border-yellow-500"><div class="text-slate-400 text-xs uppercase">รอฝาก/ถอน</div><div class="text-3xl font-bold text-yellow-400" id="st-req">0</div></div>
+                    <div class="glass p-6 border-l-4 border-green-500"><div class="text-slate-400 text-xs uppercase">ห้อง Active</div><div class="text-3xl font-bold text-green-400" id="st-rooms">0</div></div>
                 </div>
             </div>
 
-            <div id="tab-requests" class="hidden animate__animated animate__fadeIn">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold font-display">REQUESTS <span class="text-sm bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded ml-2">Pending</span></h2>
-                </div>
-                <div class="glass-card p-0 overflow-hidden">
+            <div id="page-req" class="hidden">
+                <h2 class="text-3xl font-bold mb-6">คำขอฝาก-ถอน (รออนุมัติ)</h2>
+                <div class="glass p-0 overflow-hidden">
                     <table class="w-full">
-                        <thead class="bg-slate-900/50">
-                            <tr>
-                                <th class="pl-6">User Info</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Time / Slip</th>
-                                <th class="text-right pr-6">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="request-list-body"></tbody>
+                        <thead class="bg-slate-800"><tr><th class="pl-6">ผู้เล่น</th><th>รายการ</th><th>จำนวน</th><th>เวลา</th><th class="text-right pr-6">จัดการ</th></tr></thead>
+                        <tbody id="list-req"><tr><td colspan="5" class="p-8 text-center text-slate-500">ไม่มีรายการค้าง</td></tr></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="tab-rooms" class="hidden animate__animated animate__fadeIn">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold font-display">GAME ROOMS</h2>
-                    <button onclick="UI.toggleModal('create-room', true)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> สร้างห้องใหม่
-                    </button>
+            <div id="page-rooms" class="hidden">
+                <div class="flex justify-between mb-6">
+                    <h2 class="text-3xl font-bold">จัดการห้อง</h2>
+                    <button onclick="UI.modal('create', true)" class="bg-indigo-600 px-6 py-2 rounded-lg hover:bg-indigo-500">+ สร้างห้อง</button>
                 </div>
-                <div id="room-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="list-rooms" class="grid grid-cols-3 gap-6"></div>
             </div>
 
-            <div id="tab-users" class="hidden animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold font-display mb-6">USER MANAGEMENT</h2>
-                <div class="glass-card p-4 mb-6">
-                    <input id="user-search" onkeyup="Admin.filterUsers()" class="input-admin" placeholder="ค้นหาชื่อเล่น, Email, UID...">
-                </div>
-                <div class="glass-card p-0 overflow-hidden">
+            <div id="page-users" class="hidden">
+                <h2 class="text-3xl font-bold mb-6">ผู้เล่นทั้งหมด</h2>
+                <input id="search-user" onkeyup="Admin.filterUsers()" placeholder="ค้นหาชื่อ, เบอร์, ไอดี..." class="mb-4 w-1/3">
+                <div class="glass p-0 overflow-hidden">
                     <table class="w-full">
-                        <thead class="bg-slate-900/50">
-                            <tr>
-                                <th class="pl-6">Profile</th>
-                                <th>Bank</th>
-                                <th>Credit</th>
-                                <th class="text-right pr-6">Manage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-list-body"></tbody>
+                        <thead class="bg-slate-800"><tr><th class="pl-6">Profile</th><th>Bank</th><th>Credit</th><th class="text-right pr-6">Action</th></tr></thead>
+                        <tbody id="list-users"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="tab-settings" class="hidden animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold font-display mb-6">SETTINGS</h2>
-                <div class="glass-card p-8 max-w-2xl space-y-6">
-                    <div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-xl border border-white/5">
-                        <div>
-                            <div class="font-bold">สถานะเว็บไซต์</div>
-                            <div class="text-xs text-slate-400">ปิดเพื่อปรับปรุง (ลูกค้าเข้าไม่ได้)</div>
-                        </div>
-                        <input type="checkbox" id="set-status" class="w-6 h-6 accent-indigo-500">
+            <div id="page-set" class="hidden">
+                <h2 class="text-3xl font-bold mb-6">ตั้งค่าระบบ</h2>
+                <div class="glass p-8 max-w-xl space-y-4">
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-lg">
+                        <div><div class="font-bold">สถานะเว็บ</div><div class="text-xs text-slate-400">ปิดปรับปรุง (Maintenance)</div></div>
+                        <input type="checkbox" id="set-open" class="w-6 h-6 accent-green-500">
                     </div>
-                    <div><label class="text-xs text-slate-400 font-bold ml-1">ชื่อเว็บ</label><input id="set-name" class="input-admin"></div>
-                    <div><label class="text-xs text-slate-400 font-bold ml-1">ประกาศตัววิ่ง</label><textarea id="set-annc" class="input-admin h-24 resize-none"></textarea></div>
-                    <div><label class="text-xs text-slate-400 font-bold ml-1">ลิงก์ติดต่อ (Line/FB)</label><input id="set-link" class="input-admin"></div>
-                    <div><label class="text-xs text-slate-400 font-bold ml-1">ข้อความปิดเว็บ</label><input id="set-msg" class="input-admin"></div>
-                    <button onclick="Admin.saveSettings()" class="w-full py-4 bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition">บันทึกการตั้งค่า</button>
+                    <div><label class="text-xs text-slate-400">ชื่อเว็บ</label><input id="set-name"></div>
+                    <div><label class="text-xs text-slate-400">ประกาศตัววิ่ง</label><textarea id="set-annc" class="h-24 resize-none"></textarea></div>
+                    <div><label class="text-xs text-slate-400">ลิงก์ติดต่อ (Line/FB)</label><input id="set-link"></div>
+                    <div><label class="text-xs text-slate-400">ข้อความปิดเว็บ</label><input id="set-msg"></div>
+                    <button onclick="Admin.saveSettings()" class="w-full bg-indigo-600 py-3 rounded-lg mt-4 font-bold">บันทึกการตั้งค่า</button>
                 </div>
             </div>
-
         </main>
     </div>
 
-    <div id="modal-create-room" class="modal-overlay hidden">
-        <div class="modal-box animate__animated animate__zoomIn">
-            <h3 class="text-2xl font-bold mb-6">สร้างห้องเกม</h3>
-            <div class="space-y-4">
-                <input id="c-name" class="input-admin" placeholder="ชื่อห้อง">
-                <input id="c-pass" class="input-admin" placeholder="รหัสผ่าน (ถ้ามี)">
-                <div class="grid grid-cols-2 gap-4">
-                    <select id="c-type" class="input-admin bg-[#1e293b]"><option value="cup">ซ่อนบอล</option><option value="xo">XO</option><option value="rps">เป่ายิงฉุบ</option></select>
-                    <input id="c-win" type="number" class="input-admin" value="1" placeholder="Win">
+    <div id="modal-create" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold mb-4">สร้างห้องเกม</h3>
+            <div class="space-y-3">
+                <input id="c-name" placeholder="ชื่อห้อง">
+                <input id="c-pass" placeholder="รหัสผ่าน (ถ้ามี)">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="c-type"><option value="cup">ซ่อนบอล</option><option value="xo">XO</option><option value="rps">เป่ายิงฉุบ</option></select>
+                    <input id="c-win" type="number" value="1" placeholder="Best of">
                 </div>
-                <div>
-                    <input id="c-bet" type="number" class="input-admin text-yellow-400 font-bold" placeholder="เดิมพัน (0 = ทดลอง)">
-                    <p class="text-[10px] text-slate-500 mt-1">*ใส่ 0 จะแสดงเป็นห้องทดลองเล่น (TRIAL)</p>
-                </div>
-                <div class="flex gap-3 pt-2">
-                    <button onclick="UI.toggleModal('create-room', false)" class="flex-1 py-3 bg-slate-700 rounded-xl font-bold text-slate-300">ยกเลิก</button>
-                    <button onclick="Admin.createRoom()" class="flex-1 py-3 bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500">สร้าง</button>
+                <input id="c-bet" type="number" placeholder="เดิมพัน (0=ทดลอง)" class="text-yellow-400 font-bold">
+                <div class="flex gap-2 pt-2">
+                    <button onclick="UI.modal('create',false)" class="flex-1 bg-slate-700 py-2 rounded">ยกเลิก</button>
+                    <button onclick="Admin.createRoom()" class="flex-1 bg-indigo-600 py-2 rounded">สร้าง</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-edit-user" class="modal-overlay hidden">
-        <div class="modal-box animate__animated animate__zoomIn">
-            <h3 class="text-2xl font-bold mb-6">แก้ไขผู้เล่น</h3>
+    <div id="modal-edit" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold mb-4">แก้ไขผู้เล่น</h3>
             <input type="hidden" id="e-uid">
-            <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 font-bold ml-1">ชื่อเล่น</label><input id="e-nick" class="input-admin"></div>
-                <div><label class="text-xs text-slate-400 font-bold ml-1">เครดิต (แก้โดยตรง)</label><input id="e-credit" type="number" class="input-admin text-yellow-400 font-bold"></div>
-                
-                <div class="bg-red-500/10 p-3 rounded-xl flex items-center justify-between border border-red-500/20">
-                    <span class="text-sm text-red-300 font-bold"><i class="fa-solid fa-lock mr-2"></i> ติดเงื่อนไขเครดิตฟรี (ห้ามถอน)</span>
+            <div class="space-y-3">
+                <div><label class="text-xs text-slate-400">ชื่อเล่น</label><input id="e-nick"></div>
+                <div><label class="text-xs text-slate-400">เครดิต (แก้สด)</label><input id="e-credit" type="number" class="text-yellow-400"></div>
+                <div class="bg-red-500/10 p-3 rounded border border-red-500/20 flex justify-between items-center">
+                    <span class="text-red-400 text-sm font-bold">ติดเงื่อนไขเครดิตฟรี (ห้ามถอน)</span>
                     <input type="checkbox" id="e-free" class="w-5 h-5 accent-red-500">
                 </div>
-
-                <div class="flex gap-3 pt-2">
-                    <button onclick="UI.toggleModal('edit-user', false)" class="flex-1 py-3 bg-slate-700 rounded-xl font-bold text-slate-300">ยกเลิก</button>
-                    <button onclick="Admin.saveUser()" class="flex-1 py-3 bg-green-600 rounded-xl font-bold hover:bg-green-500">บันทึก</button>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="UI.modal('edit',false)" class="flex-1 bg-slate-700 py-2 rounded">ยกเลิก</button>
+                    <button onclick="Admin.saveUser()" class="flex-1 bg-green-600 py-2 rounded">บันทึก</button>
                 </div>
             </div>
         </div>
@@ -315,169 +162,167 @@
     <script>
         // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk", authDomain: "rsdm-9ca2a.firebaseapp.com", projectId: "rsdm-9ca2a", storageBucket: "rsdm-9ca2a.firebasestorage.app", messagingSenderId: "299212700124", appId: "1:299212700124:web:730160dae6bb1b09cbb719" };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); const db = firebase.firestore();
+        firebase.initializeApp(firebaseConfig); const db=firebase.firestore(); const auth=firebase.auth();
         let allUsers = [];
 
-        // AUTH
-        function AdminAuth() {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
-            auth.signInWithEmailAndPassword(e, p).catch(err => Swal.fire('Error', err.message, 'error'));
-        }
-
-        auth.onAuthStateChanged(u => {
-            if(u) {
-                document.getElementById('login-overlay').classList.add('hidden');
-                document.getElementById('admin-interface').classList.remove('hidden');
-                Admin.init();
-            } else {
-                document.getElementById('login-overlay').classList.remove('hidden');
-                document.getElementById('admin-interface').classList.add('hidden');
-            }
-        });
-
-        // UI
         const UI = {
-            switchTab: (id) => {
-                ['dash','requests','rooms','users','settings'].forEach(p => {
-                    document.getElementById(`tab-${p}`).classList.add('hidden');
-                    document.getElementById(`nav-${p}`).classList.remove('active');
+            tab: (id) => {
+                ['dash','req','rooms','users','set'].forEach(p => {
+                    document.getElementById(`page-${p}`).classList.add('hidden');
+                    document.getElementById(`tab-${p}`).classList.remove('active');
                 });
-                document.getElementById(`tab-${id}`).classList.remove('hidden');
-                document.getElementById(`nav-${id}`).classList.add('active');
+                document.getElementById(`page-${id}`).classList.remove('hidden');
+                document.getElementById(`tab-${id}`).classList.add('active');
             },
-            toggleModal: (id, show) => {
-                const el = document.getElementById(`modal-${id}`);
-                el.style.display = show ? 'flex' : 'none';
-            },
-            toast: (msg) => Swal.fire({ title: msg, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, background: '#1e293b', color: '#fff' })
+            modal: (id, show) => document.getElementById(`modal-${id}`).style.display = show ? 'flex' : 'none',
+            toast: (t,i='success') => Swal.fire({toast:true, position:'top-end', showConfirmButton:false, timer:1500, icon:i, title:t, background:'#1e293b', color:'#fff'})
         };
 
         const Admin = {
+            login: () => {
+                const e = document.getElementById('a-email').value, p = document.getElementById('a-pass').value;
+                auth.signInWithEmailAndPassword(e, p).catch(err => UI.toast(err.message, 'error'));
+            },
             init: () => {
                 // Requests
                 db.collection('requests').orderBy('timestamp', 'desc').onSnapshot(snap => {
                     const pending = snap.docs.filter(d => d.data().status === 'pending');
+                    document.getElementById('st-req').innerText = pending.length;
                     document.getElementById('badge-req').classList.toggle('hidden', pending.length === 0);
                     document.getElementById('badge-req').innerText = pending.length;
-                    document.getElementById('st-pending').innerText = pending.length;
 
-                    const list = document.getElementById('request-list-body');
-                    if(snap.empty) list.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
-                    else {
-                        list.innerHTML = snap.docs.map(doc => {
-                            const r = doc.data();
-                            const statusBadge = r.status==='approved'?'<span class="text-green-400 font-bold">อนุมัติ</span>':(r.status==='rejected'?'<span class="text-red-400 font-bold">ปฏิเสธ</span>':'<span class="text-yellow-400 font-bold">รอตรวจสอบ</span>');
-                            let actions = r.status === 'pending' ? `
-                                <button onclick="Admin.process('${doc.id}','approved',${r.amount},'${r.type}','${r.uid}')" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-xs font-bold mr-2">อนุมัติ</button>
-                                <button onclick="Admin.process('${doc.id}','rejected',${r.amount},'${r.type}','${r.uid}')" class="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-xs font-bold">ปฏิเสธ</button>
-                            ` : '-';
-                            return `<tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                <td class="pl-6 py-4"><div>${r.nickname}</div><div class="text-xs text-slate-500">${r.uid}</div></td>
-                                <td><span class="uppercase text-xs font-bold ${r.type=='deposit'?'text-green-400':'text-red-400'}">${r.type}</span></td>
-                                <td class="font-mono font-bold text-lg">${r.amount.toLocaleString()}</td>
-                                <td class="text-xs text-slate-400">${r.timeStr}<br>${r.timestamp?.toDate().toLocaleString('th-TH')}</td>
-                                <td class="pr-6 text-right">${actions}</td>
-                            </tr>`;
-                        }).join('');
-                    }
+                    const list = document.getElementById('list-req');
+                    if(snap.empty) { list.innerHTML='<tr><td colspan="5" class="p-8 text-center text-slate-500">ไม่มีรายการ</td></tr>'; return; }
+                    
+                    list.innerHTML = snap.docs.map(doc => {
+                        const r = doc.data();
+                        const color = r.status=='approved'?'text-green-400':(r.status=='rejected'?'text-red-400':'text-yellow-400');
+                        let actions = '';
+                        if(r.status === 'pending') {
+                            const dataStr = JSON.stringify({uid:r.uid, amt:r.amount, type:r.type}).replace(/"/g, '&quot;');
+                            actions = `<button onclick="Admin.procReq('${doc.id}','approved',${dataStr})" class="bg-green-600 px-3 py-1 rounded text-xs mr-2">อนุมัติ</button>
+                                       <button onclick="Admin.procReq('${doc.id}','rejected',${dataStr})" class="bg-red-600 px-3 py-1 rounded text-xs">ปัดตก</button>`;
+                        } else actions = `<span class="text-xs text-slate-500">จบรายการ</span>`;
+
+                        return `<tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                            <td class="pl-6 py-4"><b>${r.nickname}</b><br><span class="text-xs text-slate-500">${r.uid}</span></td>
+                            <td><span class="${r.type=='deposit'?'text-green-400':'text-red-400'} font-bold uppercase">${r.type}</span></td>
+                            <td class="font-mono text-lg">${r.amount.toLocaleString()}</td>
+                            <td class="text-xs text-slate-400">${r.timeStr}<br>${r.timestamp?.toDate().toLocaleString('th-TH')}</td>
+                            <td class="text-right pr-6"><div class="mb-1 text-xs font-bold ${color}">${r.status.toUpperCase()}</div>${actions}</td>
+                        </tr>`;
+                    }).join('');
                 });
 
                 // Users
                 db.collection('users').onSnapshot(snap => {
-                    document.getElementById('st-users').innerText = snap.size;
-                    allUsers = []; snap.forEach(doc => allUsers.push({id: doc.id, ...doc.data()}));
-                    Admin.renderUsers(allUsers);
+                    document.getElementById('st-user').innerText = snap.size;
+                    allUsers = []; snap.forEach(d => allUsers.push({id:d.id, ...d.data()}));
+                    Admin.renderUser(allUsers);
                 });
 
                 // Rooms
                 db.collection('rooms').onSnapshot(snap => {
                     document.getElementById('st-rooms').innerText = snap.size;
-                    document.getElementById('room-grid').innerHTML = snap.docs.map(doc => {
-                        const r = doc.data();
-                        const betTxt = r.betAmount === 0 ? '<span class="text-green-400">TRIAL</span>' : r.betAmount;
-                        return `<div class="glass-card p-5 relative group">
-                            <div class="flex justify-between items-start mb-2">
+                    document.getElementById('list-room').innerHTML = snap.docs.map(d => {
+                        const r = d.data();
+                        return `<div class="glass p-4 relative group">
+                            <div class="flex justify-between mb-2">
                                 <div class="font-bold text-lg">${r.roomName}</div>
-                                <div class="font-mono text-yellow-400 font-bold text-xl">${betTxt}</div>
+                                <div class="font-mono text-yellow-400 font-bold">${r.betAmount===0?'TRIAL':r.betAmount}</div>
                             </div>
-                            <div class="text-xs text-slate-400 mb-4">${r.gameType.toUpperCase()} | Pass: ${r.password||'-'} | Players: ${r.players.length}/2</div>
-                            <button onclick="Admin.delRoom('${doc.id}')" class="w-full py-2 bg-red-500/10 text-red-400 rounded hover:bg-red-500 hover:text-white transition text-xs font-bold">ลบห้อง</button>
+                            <div class="text-xs text-slate-400 mb-3">${r.gameType.toUpperCase()} | Players: ${r.players.length}/2</div>
+                            <button onclick="if(confirm('ลบ?')) db.collection('rooms').doc('${d.id}').delete()" class="w-full bg-red-500/10 text-red-400 py-1 rounded text-xs hover:bg-red-500 hover:text-white">ลบห้อง</button>
                         </div>`;
                     }).join('');
                 });
-                
-                // Settings
+
+                // Config
                 db.collection('config').doc('settings').get().then(d => {
                     if(d.exists) {
                         const c = d.data();
-                        document.getElementById('set-status').checked = c.isOpen !== false;
-                        document.getElementById('set-name').value = c.siteName || '';
-                        document.getElementById('set-annc').value = c.announcement || '';
-                        document.getElementById('set-link').value = c.fbLink || '';
-                        document.getElementById('set-msg').value = c.maintenanceMsg || '';
+                        document.getElementById('set-name').value = c.siteName||'';
+                        document.getElementById('set-annc').value = c.announcement||'';
+                        document.getElementById('set-link').value = c.fbLink||'';
+                        document.getElementById('set-open').checked = c.isOpen!==false; // Default true
+                        document.getElementById('set-msg').value = c.maintenanceMsg||'';
                     }
                 });
             },
 
-            process: async (id, status, amount, type, uid) => {
+            // Logic
+            procReq: async (rid, st, d) => {
                 const batch = db.batch();
-                batch.update(db.collection('requests').doc(id), { status: status });
-                if(status === 'approved') {
-                    const change = type === 'deposit' ? amount : -amount;
-                    // Note: For withdraw, usually credit is deducted when requesting. 
-                    // But for this simple flow, we assume admin deducts now or it's a manual adjustment.
-                    // Let's assume deposit adds credit. Withdraw, we assume user credit was checked but not deducted yet?
-                    // To be safe and simple: Deposit adds. Withdraw subtracts.
-                    batch.update(db.collection('users').doc(uid), { credit: firebase.firestore.FieldValue.increment(change) });
-                    batch.set(db.collection('transactions').doc(), { uid: uid, type: type, amount: amount, timestamp: new Date(), note: 'Admin Approved' });
+                batch.update(db.collection('requests').doc(rid), {status:st});
+                if(st === 'approved') {
+                    const change = d.type==='deposit' ? d.amt : -d.amt;
+                    batch.update(db.collection('users').doc(d.uid), {credit: firebase.firestore.FieldValue.increment(change)});
+                    batch.set(db.collection('transactions').doc(), {uid:d.uid, type:d.type, amount:d.amt, timestamp:new Date(), note:'Approved'});
                 }
-                await batch.commit();
-                UI.toast('บันทึกเรียบร้อย');
+                await batch.commit(); UI.toast('บันทึกแล้ว');
             },
-
             createRoom: () => {
-                const n=document.getElementById('c-name').value, b=parseInt(document.getElementById('c-bet').value), t=document.getElementById('c-type').value, p=document.getElementById('c-pass').value, w=parseInt(document.getElementById('c-win').value);
-                if(!n) return alert('ใส่ชื่อห้อง');
-                db.collection('rooms').add({ roomName:n, betAmount:b, gameType:t, password:p, maxWins:w, players:[], scores:{}, createdAt: firebase.firestore.FieldValue.serverTimestamp(), roundState:'idle' });
-                UI.toggleModal('create-room', false); UI.toast('สร้างห้องแล้ว');
-            },
-            delRoom: (id) => { if(confirm('ลบห้องนี้?')) db.collection('rooms').doc(id).delete(); },
-            
-            filterUsers: () => {
-                const t = document.getElementById('user-search').value.toLowerCase();
-                Admin.renderUsers(allUsers.filter(u => u.nickname.toLowerCase().includes(t) || u.email.toLowerCase().includes(t)));
-            },
-            renderUsers: (us) => {
-                document.getElementById('admin-user-list').innerHTML = us.map(u => `
-                    <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                        <td class="pl-6 py-4"><div>${u.nickname} ${u.isFreeCredit?'<span class="text-xs bg-red-500 text-white px-1 rounded">ติดฟรี</span>':''}</div><div class="text-xs text-slate-500">${u.id}</div></td>
-                        <td class="text-xs text-slate-400"><div>${u.bankName||'-'}</div><div>${u.bankAcc||'-'}</div></td>
-                        <td class="font-mono text-yellow-400 font-bold">${u.credit.toLocaleString()}</td>
-                        <td class="text-right pr-6"><button onclick="Admin.editUser('${u.id}','${u.nickname}',${u.credit},${u.isFreeCredit||false})" class="bg-slate-700 px-3 py-1 rounded text-xs hover:bg-slate-600">EDIT</button></td>
-                    </tr>
-                `).join('');
-            },
-            editUser: (id, n, c, f) => {
-                document.getElementById('e-uid').value = id; document.getElementById('e-nick').value = n; document.getElementById('e-credit').value = c; document.getElementById('e-free').checked = f;
-                UI.toggleModal('edit-user', true);
-            },
-            saveUser: () => {
-                const id=document.getElementById('e-uid').value, n=document.getElementById('e-nick').value, c=parseFloat(document.getElementById('e-credit').value), f=document.getElementById('e-free').checked;
-                db.collection('users').doc(id).update({ nickname:n, credit:c, isFreeCredit:f }).then(()=>{ UI.toast('Saved'); UI.toggleModal('edit-user', false); });
+                const n=document.getElementById('c-name').value, b=parseInt(document.getElementById('c-bet').value);
+                if(!n) return UI.toast('ใส่ชื่อห้อง','warning');
+                db.collection('rooms').add({
+                    roomName:n, betAmount:b, gameType:document.getElementById('c-type').value, 
+                    password:document.getElementById('c-pass').value, maxWins:parseInt(document.getElementById('c-win').value),
+                    players:[], scores:{}, roundState:'idle', createdAt:firebase.firestore.FieldValue.serverTimestamp()
+                });
+                UI.modal('create',false); UI.toast('สร้างห้องแล้ว');
             },
             saveSettings: () => {
                 db.collection('config').doc('settings').set({
-                    isOpen: document.getElementById('set-status').checked,
                     siteName: document.getElementById('set-name').value,
                     announcement: document.getElementById('set-annc').value,
                     fbLink: document.getElementById('set-link').value,
+                    isOpen: document.getElementById('set-open').checked,
                     maintenanceMsg: document.getElementById('set-msg').value
                 }, {merge:true});
-                UI.toast('บันทึกการตั้งค่าแล้ว');
+                UI.toast('บันทึกตั้งค่าแล้ว');
+            },
+            filterUser: () => {
+                const t = document.getElementById('search-u').value.toLowerCase();
+                Admin.renderUser(allUsers.filter(u => u.nickname.toLowerCase().includes(t) || u.email.includes(t)));
+            },
+            renderUser: (us) => {
+                document.getElementById('list-user').innerHTML = us.map(u => `
+                    <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                        <td class="pl-6 py-4"><b>${u.nickname}</b> ${u.isFreeCredit?'<span class="text-xs bg-red-500 px-1 rounded text-white">ติดฟรี</span>':''}<br><span class="text-xs text-slate-500">${u.id}</span></td>
+                        <td class="text-xs text-slate-400">${u.bankName||'-'}<br>${u.bankAcc||'-'}</td>
+                        <td class="font-mono text-yellow-400 font-bold">${u.credit.toLocaleString()}</td>
+                        <td class="text-right pr-6"><button onclick="Admin.editUser('${u.id}','${u.nickname}',${u.credit},${u.isFreeCredit||false})" class="bg-slate-700 px-3 py-1 rounded text-xs">EDIT</button></td>
+                    </tr>
+                `).join('');
+            },
+            editUser: (id,n,c,f) => {
+                document.getElementById('e-uid').value=id; document.getElementById('e-nick').value=n;
+                document.getElementById('e-credit').value=c; document.getElementById('e-free').checked=f;
+                UI.modal('edit',true);
+            },
+            saveUser: () => {
+                const id = document.getElementById('e-uid').value;
+                const c = parseFloat(document.getElementById('e-credit').value);
+                const f = document.getElementById('e-free').checked;
+                db.collection('users').doc(id).update({ 
+                    nickname: document.getElementById('e-nick').value, 
+                    credit: c, 
+                    isFreeCredit: f 
+                }).then(() => { UI.toast('แก้ไขแล้ว'); UI.modal('edit',false); });
             }
         };
+
+        // Auth Listener
+        auth.onAuthStateChanged(u => {
+            if(u) {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
+                Admin.init();
+            } else {
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('admin-view').classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
