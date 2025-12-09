@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZONE. | ADMIN CENTER</title>
+    <title>ZONE. | ADMIN MANAGER</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600;800&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
@@ -99,7 +99,7 @@
                 <div class="p-5 border-b border-white/5 font-bold bg-white/5">ธุรกรรมล่าสุด (Real-time)</div>
                 <table class="w-full text-left">
                     <thead><tr><th>User</th><th>Type</th><th>Amount</th><th class="text-right">Time</th></tr></thead>
-                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">...</td></tr></tbody>
+                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">รอโหลด...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -167,17 +167,19 @@
                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 mb-6">
                     <div>
                         <div class="font-bold text-lg">สถานะเว็บไซต์</div>
-                        <div class="text-xs text-slate-400" id="status-text-display">...</div>
+                        <div class="text-xs text-slate-400 mt-1" id="status-text-display">กำลังโหลด...</div>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="set-status" class="sr-only peer" onchange="Admin.updateStatusText()">
                         <div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
                     </label>
                 </div>
+                
                 <div class="space-y-4">
                     <div><label class="text-xs text-slate-400 ml-1">ชื่อเว็บ (Title)</label><input id="set-name" class="input-adm"></div>
                     <div><label class="text-xs text-slate-400 ml-1">ประกาศวิ่ง (Marquee)</label><textarea id="set-annc" class="input-adm h-24 resize-none"></textarea></div>
                     <div><label class="text-xs text-slate-400 ml-1">ลิงก์ติดต่อ (Line/FB)</label><input id="set-fb" class="input-adm"></div>
+                    <div><label class="text-xs text-slate-400 ml-1">Maintenance Message</label><input id="set-msg" class="input-adm" placeholder="ข้อความปิดปรับปรุง"></div>
                     <button onclick="Admin.saveSettings()" class="w-full btn-pink py-3 mt-4">บันทึกการตั้งค่า</button>
                 </div>
             </div>
@@ -276,7 +278,7 @@
                     document.getElementById('stat-pending').innerText = pending.length;
                     document.getElementById('noti-badge').classList.toggle('hidden', pending.length === 0);
                     const list = document.getElementById('request-list');
-                    if(pending.length === 0) { list.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500">ไม่มีรายการค้าง</td></tr>'; document.getElementById('empty-req').classList.remove('hidden'); return; }
+                    if(pending.length === 0) { list.innerHTML = ''; document.getElementById('empty-req').classList.remove('hidden'); return; }
                     document.getElementById('empty-req').classList.add('hidden');
                     list.innerHTML = pending.map(r => {
                         const isDep = r.type === 'deposit';
@@ -351,6 +353,8 @@
                 }).join('');
             },
             
+            // --- EDIT USER LOGIC ---
+            currentEditUser: null,
             openEdit: (id) => {
                 Admin.currentEditUser = allUsers.find(u => u.id === id);
                 const u = Admin.currentEditUser;
@@ -389,18 +393,36 @@
                 });
             },
 
-            loadSettings: () => { db.collection('config').doc('settings').onSnapshot(d => { if(d.exists) { const v=d.data(); 
-                document.getElementById('set-status').checked = v.isOpen !== false; 
-                Admin.updateStatusText(); // Update Text
-                document.getElementById('set-name').value=v.siteName||''; document.getElementById('set-annc').value=v.announcement||''; document.getElementById('set-fb').value=v.fbLink||''; document.getElementById('set-msg').value=v.maintenanceMsg||''; 
-            } }); },
+            // --- FIXED SETTINGS LOGIC ---
+            loadSettings: () => { 
+                db.collection('config').doc('settings').onSnapshot(d => { 
+                    if(d.exists) { 
+                        const v=d.data(); 
+                        document.getElementById('set-status').checked = v.isOpen !== false; 
+                        Admin.updateStatusText();
+                        document.getElementById('set-name').value = v.siteName || ''; 
+                        document.getElementById('set-annc').value = v.announcement || ''; 
+                        document.getElementById('set-fb').value = v.fbLink || ''; 
+                        document.getElementById('set-msg').value = v.maintenanceMsg || ''; 
+                    } else { Admin.saveSettings(); } 
+                }); 
+            },
             updateStatusText: () => {
                 const isOpen = document.getElementById('set-status').checked;
                 const txt = document.getElementById('status-text-display');
                 if(isOpen) { txt.innerText = "🟢 เปิดให้บริการ"; txt.className = "text-xs text-green-400 font-bold"; }
                 else { txt.innerText = "🔴 ปิดปรับปรุง"; txt.className = "text-xs text-red-400 font-bold"; }
             },
-            saveSettings: () => { db.collection('config').doc('settings').set({ isOpen: document.getElementById('set-status').checked, siteName: document.getElementById('set-name').value, announcement: document.getElementById('set-annc').value, fbLink: document.getElementById('set-fb').value, maintenanceMsg: document.getElementById('set-msg').value }, { merge: true }); UI.toast('บันทึกแล้ว'); }
+            saveSettings: () => { 
+                db.collection('config').doc('settings').set({ 
+                    isOpen: document.getElementById('set-status').checked, 
+                    siteName: document.getElementById('set-name').value, 
+                    announcement: document.getElementById('set-annc').value, 
+                    fbLink: document.getElementById('set-fb').value, 
+                    maintenanceMsg: document.getElementById('set-msg').value 
+                }, { merge: true }); 
+                UI.toast('บันทึกการตั้งค่าแล้ว'); 
+            }
         };
 
         auth.onAuthStateChanged(user => {
@@ -411,7 +433,6 @@
                 
                 Admin.loadSettings(); Admin.loadRequests();
 
-                // FIXED ROOM LOADING (No orderBy server-side)
                 db.collection('rooms').onSnapshot(s => { 
                     const list = document.getElementById('admin-room-list');
                     if(s.empty) { list.innerHTML = '<div class="col-span-full py-10 text-center text-slate-500 border border-dashed border-pink-500/30 rounded-xl">ยังไม่มีห้อง (กดสร้างใหม่ด้านบน)</div>'; return; }
