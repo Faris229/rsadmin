@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN | PINK SYSTEM</title>
+    <title>ADMIN | ROOM FIXED</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600;800&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
@@ -39,11 +39,8 @@
         .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6); }
         .menu-item { display: flex; items-center; gap: 12px; padding: 16px; border-radius: 12px; color: #9ca3af; transition: 0.3s; cursor: pointer; }
         .menu-item:hover, .menu-item.active { background: rgba(236, 72, 153, 0.1); color: #ec4899; border-right: 4px solid #ec4899; }
-        
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #1a0b2e; width: 90%; max-width: 550px; padding: 30px; border-radius: 24px; border: 1px solid rgba(236, 72, 153, 0.3); animation: zoomIn 0.3s; position: relative; }
-        
-        /* Table & Badges */
+        .modal-box { background: #1a0b2e; width: 90%; max-width: 500px; padding: 30px; border-radius: 24px; border: 1px solid rgba(236, 72, 153, 0.3); animation: zoomIn 0.3s; position: relative; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 16px; color: #ec4899; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
         td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
@@ -76,8 +73,8 @@
         <nav class="flex-1 space-y-1">
             <div onclick="UI.tab('dash')" id="tab-dash" class="menu-item active"><i class="fa-solid fa-chart-line w-6"></i> แดชบอร์ด</div>
             <div onclick="UI.tab('trans')" id="tab-trans" class="menu-item"><i class="fa-solid fa-money-bill-transfer w-6"></i> อนุมัติฝาก/ถอน <span id="noti-badge" class="ml-auto bg-red-500 text-white text-[10px] px-2 rounded-full hidden">!</span></div>
+            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> จัดการห้องเกม</div>
             <div onclick="UI.tab('users')" id="tab-users" class="menu-item"><i class="fa-solid fa-users w-6"></i> จัดการลูกค้า</div>
-            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> ห้องเกม</div>
             <div onclick="UI.tab('settings')" id="tab-settings" class="menu-item"><i class="fa-solid fa-gears w-6"></i> ตั้งค่าเว็บไซต์</div>
         </nav>
         <button onclick="auth.signOut()" class="bg-red-500/10 text-red-400 py-3 rounded-xl font-bold hover:bg-red-500/20 transition mt-4"><i class="fa-solid fa-power-off mr-2"></i> ออกจากระบบ</button>
@@ -102,7 +99,7 @@
                 <div class="p-5 border-b border-white/5 font-bold bg-white/5">ธุรกรรมล่าสุด (Real-time)</div>
                 <table class="w-full text-left">
                     <thead><tr><th>User</th><th>Type</th><th>Amount</th><th class="text-right">Time</th></tr></thead>
-                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">รอโหลด...</td></tr></tbody>
+                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -125,7 +122,7 @@
                     <div class="glass-card p-6 border-t-4 border-pink-500">
                         <h3 class="font-bold mb-4">เติมมือ (Manual)</h3>
                         <div class="space-y-4">
-                            <div><label class="text-xs text-slate-400 ml-1">UID / Email</label><input id="m-uid" class="input-adm" placeholder="ค้นหา..."></div>
+                            <div><label class="text-xs text-slate-400 ml-1">UID / Email ลูกค้า</label><input id="m-uid" class="input-adm" placeholder="ค้นหา..."></div>
                             <div><label class="text-xs text-slate-400 ml-1">จำนวนเงิน</label><input id="m-amt" type="number" class="input-adm" placeholder="0.00"></div>
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="Admin.manual('deposit')" class="bg-green-600 hover:bg-green-500 py-3 rounded-xl font-bold text-sm">เติม (+)</button>
@@ -134,10 +131,21 @@
                         </div>
                     </div>
                     <div class="p-4 rounded-xl bg-blue-900/20 text-xs text-blue-200 border border-blue-500/20">
-                        <h4 class="font-bold mb-2">หมายเหตุการถอน:</h4>
-                        <p>หากลูกค้าติดสถานะ <span class="text-red-400 font-bold">LOCK</span> จะถอนไม่ได้ ต้องไปปลดล็อคที่หน้า "จัดการลูกค้า" ก่อน</p>
+                        <h4 class="font-bold mb-2">หมายเหตุ:</h4>
+                        <p>หากลูกค้าติดสถานะ <span class="text-red-400 font-bold">LOCK</span> จะถอนไม่ได้ ต้องไปปลดล็อคที่หน้า "จัดการลูกค้า"</p>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="page-rooms" class="hidden animate__animated animate__fadeIn">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold font-display">จัดการห้องเกม</h1>
+                <button onclick="UI.modal('create-room', true)" class="btn-pink px-6 py-2 shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> สร้างห้องใหม่</button>
+            </div>
+            
+            <div id="admin-room-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full py-10 text-center text-slate-500 animate-pulse">กำลังโหลดข้อมูลห้อง...</div>
             </div>
         </div>
 
@@ -152,14 +160,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-
-        <div id="page-rooms" class="hidden animate__animated animate__fadeIn">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold font-display">จัดการห้องเกม</h1>
-                <button onclick="UI.modal('create-room', true)" class="btn-pink px-6 py-2 shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> สร้างห้องใหม่</button>
-            </div>
-            <div id="admin-room-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
         <div id="page-settings" class="hidden animate__animated animate__fadeIn">
@@ -209,7 +209,7 @@
             <input type="hidden" id="e-uid">
             
             <div class="flex bg-slate-800 rounded-lg p-1 mb-4">
-                <button onclick="Admin.switchEditTab('info')" id="tab-e-info" class="flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition">ข้อมูลทั่วไป</button>
+                <button onclick="Admin.switchEditTab('info')" id="tab-e-info" class="flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition">ข้อมูล</button>
                 <button onclick="Admin.switchEditTab('bonus')" id="tab-e-bonus" class="flex-1 py-2 rounded-md font-bold text-xs text-slate-400 hover:text-white transition">เครดิตฟรี & ล็อค</button>
             </div>
 
@@ -221,18 +221,13 @@
             <div id="edit-tab-bonus" class="space-y-4 hidden">
                 <div class="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center">
                     <h4 class="font-bold text-yellow-400 mb-2">🎁 แจกเครดิตฟรี</h4>
-                    <p class="text-xs text-slate-400 mb-4">เมื่อแจกแล้ว ระบบจะ <span class="text-red-400">ล็อคการถอน</span> อัตโนมัติ</p>
                     <div class="flex gap-2">
                         <input id="e-free-amt" type="number" class="input-adm text-center" placeholder="จำนวน">
                         <button onclick="Admin.giveFreeCredit()" class="bg-yellow-600 hover:bg-yellow-500 px-4 rounded-xl font-bold">แจก</button>
                     </div>
                 </div>
-                
                 <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex justify-between items-center">
-                    <div>
-                        <div class="font-bold text-red-400">สถานะการถอน</div>
-                        <div class="text-xs text-slate-400" id="e-lock-status">...</div>
-                    </div>
+                    <div><div class="font-bold text-red-400">สถานะการถอน</div><div class="text-xs text-slate-400" id="e-lock-status">...</div></div>
                     <button onclick="Admin.toggleLock()" id="btn-toggle-lock" class="bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold">เปลี่ยน</button>
                 </div>
             </div>
@@ -260,12 +255,12 @@
             login: () => { auth.signInWithEmailAndPassword(document.getElementById('a-email').value, document.getElementById('a-pass').value).catch(err => Swal.fire('ผิดพลาด', err.message, 'error')); },
             
             fixData: async () => {
-                const conf = confirm('ต้องการสร้างข้อมูลตัวอย่างหรือไม่?');
+                const conf = confirm('ต้องการสร้างข้อมูลตัวอย่างหรือไม่? (กดเมื่อเว็บไม่มีข้อมูล)');
                 if(!conf) return;
                 try {
                     await db.collection('config').doc('settings').set({isOpen: true, siteName: 'ZONE.', announcement: 'ยินดีต้อนรับสู่ ZONE.', fbLink: '', maintenanceMsg: 'ระบบปิดปรับปรุง'}, {merge: true});
                     await db.collection('rooms').add({roomName: 'ห้องซ้อมมือ (Auto)', betAmount: 0, gameType: 'xo', players: [], maxWins: 1, createdAt: new Date()});
-                    UI.toast('สร้างข้อมูลเรียบร้อย');
+                    UI.toast('สร้างข้อมูลเรียบร้อย รีเฟรชหน้าเว็บได้เลย');
                 } catch(e) { Swal.fire('Error', e.message, 'error'); }
             },
 
@@ -276,7 +271,7 @@
                     document.getElementById('stat-pending').innerText = pending.length;
                     document.getElementById('noti-badge').classList.toggle('hidden', pending.length === 0);
                     const list = document.getElementById('request-list');
-                    if(pending.length === 0) { list.innerHTML = ''; document.getElementById('empty-req').classList.remove('hidden'); return; }
+                    if(pending.length === 0) { list.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500">ไม่มีรายการค้าง</td></tr>'; document.getElementById('empty-req').classList.remove('hidden'); return; }
                     document.getElementById('empty-req').classList.add('hidden');
                     list.innerHTML = pending.map(r => {
                         const isDep = r.type === 'deposit';
@@ -351,7 +346,7 @@
                 }).join('');
             },
             
-            // --- EDIT USER & FREE CREDIT ---
+            // --- EDIT USER LOGIC ---
             currentEditUser: null,
             openEdit: (id) => {
                 Admin.currentEditUser = allUsers.find(u => u.id === id);
@@ -360,21 +355,16 @@
                 document.getElementById('e-nick').value = u.nickname;
                 document.getElementById('e-credit').value = u.credit;
                 
-                // Update Lock Status Text
                 const lockTxt = document.getElementById('e-lock-status');
                 const btnLock = document.getElementById('btn-toggle-lock');
                 if(u.isFreeCredit) {
                     lockTxt.innerHTML = '<span class="text-red-400 font-bold">🔒 ติดเงื่อนไข (ถอนไม่ได้)</span>';
-                    btnLock.innerText = 'ปลดล็อค';
-                    btnLock.className = 'bg-green-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500';
+                    btnLock.innerText = 'ปลดล็อค'; btnLock.className = 'bg-green-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500';
                 } else {
                     lockTxt.innerHTML = '<span class="text-green-400 font-bold">✔ ปกติ (ถอนได้)</span>';
-                    btnLock.innerText = 'ล็อค';
-                    btnLock.className = 'bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500';
+                    btnLock.innerText = 'ล็อค'; btnLock.className = 'bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500';
                 }
-
-                UI.modal('edit-user', true);
-                Admin.switchEditTab('info');
+                UI.modal('edit-user', true); Admin.switchEditTab('info');
             },
             switchEditTab: (tab) => {
                 document.getElementById('edit-tab-info').classList.toggle('hidden', tab!=='info');
@@ -383,35 +373,22 @@
                 document.getElementById('tab-e-bonus').className = tab==='bonus' ? 'flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition' : 'flex-1 py-2 rounded-md font-bold text-xs text-slate-400 hover:text-white transition';
             },
             giveFreeCredit: () => {
-                const amt = parseFloat(document.getElementById('e-free-amt').value);
-                const uid = document.getElementById('e-uid').value;
+                const amt = parseFloat(document.getElementById('e-free-amt').value); const uid = document.getElementById('e-uid').value;
                 if(!amt) return UI.toast('ใส่จำนวนเงิน', 'warning');
-                
-                db.collection('users').doc(uid).update({
-                    credit: firebase.firestore.FieldValue.increment(amt),
-                    isFreeCredit: true // LOCK WITHDRAWAL
-                }).then(() => {
+                db.collection('users').doc(uid).update({ credit: firebase.firestore.FieldValue.increment(amt), isFreeCredit: true }).then(() => {
                     db.collection('transactions').add({ uid, type: 'bonus_credit', amount: amt, note: 'Free Credit (Locked)', timestamp: new Date() });
-                    UI.toast(`แจก ${amt} เครดิต (ล็อคถอน)`);
-                    UI.modal('edit-user', false);
+                    UI.toast(`แจก ${amt} เครดิต (ล็อคถอน)`); UI.modal('edit-user', false);
                 });
             },
             toggleLock: () => {
-                const uid = document.getElementById('e-uid').value;
-                const currentStatus = Admin.currentEditUser.isFreeCredit;
-                db.collection('users').doc(uid).update({ isFreeCredit: !currentStatus }).then(() => {
-                    UI.toast(currentStatus ? 'ปลดล็อคแล้ว' : 'ล็อคบัญชีแล้ว');
-                    UI.modal('edit-user', false);
-                });
+                const uid = document.getElementById('e-uid').value; const currentStatus = Admin.currentEditUser.isFreeCredit;
+                db.collection('users').doc(uid).update({ isFreeCredit: !currentStatus }).then(() => { UI.toast(currentStatus ? 'ปลดล็อคแล้ว' : 'ล็อคบัญชีแล้ว'); UI.modal('edit-user', false); });
             },
             saveUser: () => {
                 const id=document.getElementById('e-uid').value, c=parseFloat(document.getElementById('e-credit').value), n=document.getElementById('e-nick').value;
                 db.collection('users').doc(id).get().then(doc => {
                     const old = doc.data().credit;
-                    db.collection('users').doc(id).update({ nickname: n, credit: c }).then(() => { 
-                        if(old !== c) db.collection('transactions').add({ uid: id, type: 'admin_edit', amount: c-old, note: `Edit ${old}->${c}`, timestamp: new Date() });
-                        UI.toast('บันทึกข้อมูลแล้ว'); UI.modal('edit-user', false); 
-                    });
+                    db.collection('users').doc(id).update({ nickname: n, credit: c }).then(() => { if(old !== c) db.collection('transactions').add({ uid: id, type: 'admin_edit', amount: c-old, note: `Edit ${old}->${c}`, timestamp: new Date() }); UI.toast('บันทึกข้อมูลแล้ว'); UI.modal('edit-user', false); });
                 });
             },
 
@@ -427,11 +404,19 @@
                 
                 Admin.loadSettings(); Admin.loadRequests();
 
+                // FIXED ROOM LOADING (No orderBy server-side)
                 db.collection('rooms').onSnapshot(s => { 
-                    document.getElementById('stat-rooms').innerText = s.size;
                     const list = document.getElementById('admin-room-list');
                     if(s.empty) { list.innerHTML = '<div class="col-span-full py-10 text-center text-slate-500 border border-dashed border-pink-500/30 rounded-xl">ยังไม่มีห้อง (กดสร้างใหม่ด้านบน)</div>'; return; }
-                    list.innerHTML = s.docs.map(d => { const r=d.data(); const isTrial = r.betAmount === 0; return `<div class="glass-card p-5 border-l-4 ${isTrial?'border-green-500':'border-pink-500'} flex justify-between items-center group hover:bg-white/5 relative overflow-hidden"><div class="relative z-10"><div class="font-bold text-lg text-white flex items-center gap-2">${r.roomName} ${isTrial ? '<span class="bg-green-500 text-[10px] px-2 rounded text-white">DEMO</span>' : ''}</div><div class="text-xs text-slate-400 font-mono mt-1 bg-slate-900/50 px-2 py-1 rounded inline-block"><span class="text-pink-400 font-bold">${r.gameType.toUpperCase()}</span> | Pass: ${r.password} | Bet: ${r.betAmount}</div></div><button onclick="Admin.deleteRoom('${d.id}')" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition border border-red-500/20 z-10"><i class="fa-solid fa-trash"></i> ลบ</button></div>`; }).join('');
+                    
+                    // Client-side Sort
+                    const rooms = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+                    
+                    list.innerHTML = rooms.map(r => { 
+                        const isTrial = r.betAmount === 0;
+                        const typeMap = {'xo':'XO', 'rps':'เป่ายิ้งฉุบ', 'cup':'ยิงจุดโทษ'};
+                        return `<div class="glass-card p-5 border-l-4 ${isTrial?'border-green-500':'border-pink-500'} flex justify-between items-center group hover:bg-white/5 relative overflow-hidden"><div class="relative z-10"><div class="font-bold text-lg text-white flex items-center gap-2">${r.roomName} ${isTrial ? '<span class="bg-green-500 text-[10px] px-2 rounded text-white">DEMO</span>' : ''}</div><div class="text-xs text-slate-400 font-mono mt-1 bg-slate-900/50 px-2 py-1 rounded inline-block"><span class="text-pink-400 font-bold">${typeMap[r.gameType]||'GAME'}</span> | Pass: ${r.password} | Bet: ${r.betAmount}</div></div><button onclick="Admin.deleteRoom('${r.id}')" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition border border-red-500/20 z-10"><i class="fa-solid fa-trash"></i> ลบ</button></div>`; 
+                    }).join('');
                 });
 
                 db.collection('users').onSnapshot(s => { document.getElementById('stat-users').innerText = s.size; allUsers=[]; s.forEach(d => allUsers.push({id:d.id, ...d.data()})); Admin.renderUsers(allUsers); });
