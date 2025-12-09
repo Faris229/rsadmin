@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZONE. | ADMIN CENTER</title>
+    <title>ADMIN | PINK SYSTEM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600;800&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -20,7 +20,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Prompt', 'sans-serif'], display: ['Kanit', 'sans-serif'] },
-                    colors: { pink: { glow: '#ec4899', deep: '#be185d' } },
+                    colors: { pink: { glow: '#ec4899', deep: '#be185d', dark: '#831843' } },
                     animation: { 'pulse-glow': 'pulseGlow 2s infinite' },
                     keyframes: { pulseGlow: { '0%, 100%': { boxShadow: '0 0 5px #ec4899' }, '50%': { boxShadow: '0 0 20px #ec4899' } } }
                 }
@@ -31,25 +31,27 @@
     <style>
         body { background-color: #050b14; color: #fff; overflow-x: hidden; }
         .bg-cyber { position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at 50% -20%, #4c1d95 0%, #050b14 70%); }
-        .glass-card { background: linear-gradient(145deg, rgba(26, 11, 46, 0.8), rgba(15, 5, 24, 0.95)); backdrop-filter: blur(16px); border: 1px solid rgba(236, 72, 153, 0.2); border-radius: 20px; }
+        .glass-card { background: linear-gradient(145deg, rgba(26, 11, 46, 0.8), rgba(15, 5, 24, 0.95)); backdrop-filter: blur(16px); border: 1px solid rgba(236, 72, 153, 0.2); border-radius: 20px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
         .glass-nav { background: rgba(15, 5, 24, 0.95); border-right: 1px solid rgba(236, 72, 153, 0.1); }
-        .input-cyber { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid #be185d; padding: 12px; border-radius: 12px; color: white; outline: none; transition: 0.3s; }
-        .input-cyber:focus { border-color: #ec4899; box-shadow: 0 0 10px rgba(236, 72, 153, 0.3); }
+        .input-adm { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid #be185d; padding: 12px; border-radius: 10px; color: white; outline: none; transition: 0.3s; }
+        .input-adm:focus { border-color: #ec4899; box-shadow: 0 0 10px rgba(236, 72, 153, 0.3); }
         .btn-pink { background: linear-gradient(135deg, #ec4899, #d946ef); color: white; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4); transition: 0.3s; }
         .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6); }
         .menu-item { display: flex; items-center; gap: 12px; padding: 16px; border-radius: 12px; color: #9ca3af; transition: 0.3s; cursor: pointer; }
-        .menu-item:hover, .menu-item.active { background: rgba(236, 72, 153, 0.1); color: #ec4899; border-right: 3px solid #ec4899; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #1a0b2e; width: 90%; max-width: 500px; padding: 30px; border-radius: 24px; border: 1px solid rgba(236, 72, 153, 0.3); animation: zoomIn 0.3s; }
+        .menu-item:hover, .menu-item.active { background: rgba(236, 72, 153, 0.1); color: #ec4899; border-right: 4px solid #ec4899; }
         
-        /* Table */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #1a0b2e; width: 90%; max-width: 550px; padding: 30px; border-radius: 24px; border: 1px solid rgba(236, 72, 153, 0.3); animation: zoomIn 0.3s; position: relative; }
+        
+        /* Table & Badges */
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 16px; color: #ec4899; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
         td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
         tr:hover { background: rgba(236, 72, 153, 0.05); }
+        .lock-badge { background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="flex h-screen text-sm md:text-base">
 
     <div class="bg-cyber"></div>
 
@@ -58,8 +60,8 @@
             <h1 class="text-5xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-2">ZONE.</h1>
             <p class="text-pink-300 text-xs font-bold tracking-[0.3em] uppercase mb-8">ADMINISTRATOR</p>
             <div class="space-y-4">
-                <input id="a-email" value="faris@gmail.com" class="input-cyber text-center" placeholder="Email">
-                <input id="a-pass" type="password" class="input-cyber text-center" placeholder="Password">
+                <input id="a-email" value="faris@gmail.com" class="input-adm text-center" placeholder="Email">
+                <input id="a-pass" type="password" class="input-adm text-center" placeholder="Password">
                 <button onclick="Admin.login()" class="btn-pink w-full py-3 text-lg">เข้าสู่ระบบ</button>
             </div>
         </div>
@@ -67,18 +69,17 @@
 
     <aside id="sidebar" class="w-64 glass-nav hidden flex-col p-6 z-50 h-full">
         <div class="flex items-center gap-3 mb-10 px-2">
-            <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-xl font-bold">A</div>
+            <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-xl font-bold shadow-lg shadow-pink-500/30">A</div>
             <div><div class="font-bold text-lg leading-none">ZONE.</div><div class="text-[10px] text-green-400 font-bold">● SYSTEM ONLINE</div></div>
         </div>
         
         <nav class="flex-1 space-y-1">
             <div onclick="UI.tab('dash')" id="tab-dash" class="menu-item active"><i class="fa-solid fa-chart-line w-6"></i> แดชบอร์ด</div>
             <div onclick="UI.tab('trans')" id="tab-trans" class="menu-item"><i class="fa-solid fa-money-bill-transfer w-6"></i> อนุมัติฝาก/ถอน <span id="noti-badge" class="ml-auto bg-red-500 text-white text-[10px] px-2 rounded-full hidden">!</span></div>
-            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> จัดการห้องเกม</div>
             <div onclick="UI.tab('users')" id="tab-users" class="menu-item"><i class="fa-solid fa-users w-6"></i> จัดการลูกค้า</div>
+            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> ห้องเกม</div>
             <div onclick="UI.tab('settings')" id="tab-settings" class="menu-item"><i class="fa-solid fa-gears w-6"></i> ตั้งค่าเว็บไซต์</div>
         </nav>
-
         <button onclick="auth.signOut()" class="bg-red-500/10 text-red-400 py-3 rounded-xl font-bold hover:bg-red-500/20 transition mt-4"><i class="fa-solid fa-power-off mr-2"></i> ออกจากระบบ</button>
     </aside>
 
@@ -86,13 +87,13 @@
         
         <div id="page-dash" class="animate__animated animate__fadeIn">
             <header class="flex justify-between items-center mb-8">
-                <div><h1 class="text-3xl font-bold font-display">ภาพรวมระบบ</h1><p class="text-slate-400">สถิติวันนี้</p></div>
-                <button onclick="Admin.fixData()" class="bg-yellow-600/20 text-yellow-400 border border-yellow-600/50 px-4 py-2 rounded-lg text-sm hover:bg-yellow-600 hover:text-white transition"><i class="fa-solid fa-wrench mr-2"></i> ซ่อมฐานข้อมูล (เมื่อเว็บโล่ง)</button>
+                <div><h1 class="text-3xl font-bold font-display">ภาพรวมระบบ</h1><p class="text-slate-400">สถิติและข้อมูลล่าสุด</p></div>
+                <button onclick="Admin.fixData()" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-4 py-2 rounded-lg text-sm hover:bg-yellow-500 hover:text-black transition"><i class="fa-solid fa-wrench mr-2"></i> ซ่อมฐานข้อมูล (เมื่อเว็บโล่ง)</button>
             </header>
 
             <div class="grid grid-cols-4 gap-6 mb-8">
                 <div class="glass-card p-6 border-b-4 border-blue-500"><div class="text-slate-400 text-xs uppercase font-bold">ลูกค้าทั้งหมด</div><div id="stat-users" class="text-4xl font-bold mt-2">0</div></div>
-                <div class="glass-card p-6 border-b-4 border-yellow-500"><div class="text-slate-400 text-xs uppercase font-bold">รายการรออนุมัติ</div><div id="stat-pending" class="text-4xl font-bold mt-2 text-yellow-400">0</div></div>
+                <div class="glass-card p-6 border-b-4 border-yellow-500"><div class="text-slate-400 text-xs uppercase font-bold">รออนุมัติ</div><div id="stat-pending" class="text-4xl font-bold mt-2 text-yellow-400">0</div></div>
                 <div class="glass-card p-6 border-b-4 border-green-500"><div class="text-slate-400 text-xs uppercase font-bold">ยอดฝากรวม</div><div id="stat-dep" class="text-3xl font-mono font-bold mt-2 text-green-400">0</div></div>
                 <div class="glass-card p-6 border-b-4 border-red-500"><div class="text-slate-400 text-xs uppercase font-bold">ยอดถอนรวม</div><div id="stat-wit" class="text-3xl font-mono font-bold mt-2 text-red-400">0</div></div>
             </div>
@@ -101,7 +102,7 @@
                 <div class="p-5 border-b border-white/5 font-bold bg-white/5">ธุรกรรมล่าสุด (Real-time)</div>
                 <table class="w-full text-left">
                     <thead><tr><th>User</th><th>Type</th><th>Amount</th><th class="text-right">Time</th></tr></thead>
-                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">...</td></tr></tbody>
+                    <tbody id="live-trans"><tr><td colspan="4" class="text-center p-8 text-slate-500">รอโหลด...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -122,16 +123,33 @@
 
                 <div class="col-span-1 space-y-6">
                     <div class="glass-card p-6 border-t-4 border-pink-500">
-                        <h3 class="font-bold mb-4">จัดการเครดิต (Manual)</h3>
+                        <h3 class="font-bold mb-4">เติมมือ (Manual)</h3>
                         <div class="space-y-4">
-                            <div><label class="text-xs text-slate-400 ml-1">UID / Email ลูกค้า</label><input id="m-uid" class="input-cyber" placeholder="ค้นหา..."></div>
-                            <div><label class="text-xs text-slate-400 ml-1">จำนวนเงิน</label><input id="m-amt" type="number" class="input-cyber" placeholder="0.00"></div>
+                            <div><label class="text-xs text-slate-400 ml-1">UID / Email</label><input id="m-uid" class="input-adm" placeholder="ค้นหา..."></div>
+                            <div><label class="text-xs text-slate-400 ml-1">จำนวนเงิน</label><input id="m-amt" type="number" class="input-adm" placeholder="0.00"></div>
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="Admin.manual('deposit')" class="bg-green-600 hover:bg-green-500 py-3 rounded-xl font-bold text-sm">เติม (+)</button>
                                 <button onclick="Admin.manual('withdraw')" class="bg-red-600 hover:bg-red-500 py-3 rounded-xl font-bold text-sm">ลบ (-)</button>
                             </div>
                         </div>
                     </div>
+                    <div class="p-4 rounded-xl bg-blue-900/20 text-xs text-blue-200 border border-blue-500/20">
+                        <h4 class="font-bold mb-2">หมายเหตุการถอน:</h4>
+                        <p>หากลูกค้าติดสถานะ <span class="text-red-400 font-bold">LOCK</span> จะถอนไม่ได้ ต้องไปปลดล็อคที่หน้า "จัดการลูกค้า" ก่อน</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-users" class="hidden animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-bold mb-8 font-display">จัดการลูกค้า & เครดิตฟรี</h1>
+            <div class="glass-card overflow-hidden">
+                <div class="p-4 border-b border-white/5"><input id="search-user" onkeyup="Admin.filterUsers()" class="input-adm pl-4 w-64" placeholder="ค้นหาชื่อ, เบอร์, ไอดี..."></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5"><tr><th>ข้อมูลลูกค้า</th><th>ธนาคาร</th><th>เครดิต / สถานะ</th><th>จัดการ</th></tr></thead>
+                        <tbody id="admin-user-list"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -144,19 +162,6 @@
             <div id="admin-room-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
-        <div id="page-users" class="hidden animate__animated animate__fadeIn">
-            <h1 class="text-3xl font-bold mb-8 font-display">รายชื่อลูกค้า</h1>
-            <div class="glass-card overflow-hidden">
-                <div class="p-4 border-b border-white/5"><input id="search-user" onkeyup="Admin.filterUsers()" class="input-cyber pl-4 w-64" placeholder="ค้นหาชื่อ, เบอร์, ไอดี..."></div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-white/5"><tr><th>ข้อมูลลูกค้า</th><th>ธนาคาร</th><th>เครดิต</th><th>จัดการ</th></tr></thead>
-                        <tbody id="admin-user-list"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <div id="page-settings" class="hidden animate__animated animate__fadeIn">
             <h1 class="text-3xl font-bold mb-8 font-display">ตั้งค่าเว็บไซต์</h1>
             <div class="glass-card p-8 max-w-2xl">
@@ -165,9 +170,9 @@
                     <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="set-status" class="sr-only peer"><div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div></label>
                 </div>
                 <div class="space-y-4">
-                    <div><label class="text-xs text-slate-400 ml-1">ชื่อเว็บ (Title)</label><input id="set-name" class="input-cyber"></div>
-                    <div><label class="text-xs text-slate-400 ml-1">ประกาศวิ่ง (Marquee)</label><textarea id="set-annc" class="input-cyber h-24 resize-none"></textarea></div>
-                    <div><label class="text-xs text-slate-400 ml-1">ลิงก์ติดต่อ (Line/FB)</label><input id="set-fb" class="input-cyber"></div>
+                    <div><label class="text-xs text-slate-400 ml-1">ชื่อเว็บ (Title)</label><input id="set-name" class="input-adm"></div>
+                    <div><label class="text-xs text-slate-400 ml-1">ประกาศวิ่ง (Marquee)</label><textarea id="set-annc" class="input-adm h-24 resize-none"></textarea></div>
+                    <div><label class="text-xs text-slate-400 ml-1">ลิงก์ติดต่อ (Line/FB)</label><input id="set-fb" class="input-adm"></div>
                     <button onclick="Admin.saveSettings()" class="w-full btn-pink py-3 mt-4">บันทึกการตั้งค่า</button>
                 </div>
             </div>
@@ -179,17 +184,17 @@
         <div class="modal-box animate__animated animate__zoomIn">
             <h3 class="font-bold text-xl mb-6 text-white text-center">สร้างห้องเดิมพัน</h3>
             <div class="space-y-4">
-                <input id="c-name" class="input-cyber" placeholder="ชื่อห้อง (เช่น ห้องคนรวย)">
-                <input id="c-pass" class="input-cyber" placeholder="รหัสผ่าน (ว่างไว้ถ้าไม่ล็อค)">
+                <input id="c-name" class="input-adm" placeholder="ชื่อห้อง">
+                <input id="c-pass" class="input-adm" placeholder="รหัสผ่าน (ว่างไว้ถ้าไม่ล็อค)">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-xs ml-1 text-slate-400">เกม</label><select id="c-type" class="input-cyber bg-[#1a0b2e]"><option value="xo">XO</option><option value="rps">เป่ายิ้งฉุบ</option><option value="cup">ยิงจุดโทษ (Cup)</option></select></div>
-                    <div><label class="text-xs ml-1 text-slate-400">ชนะกี่ตา (Win)</label><input id="c-win" type="number" class="input-cyber" value="3"></div>
+                    <div><label class="text-xs ml-1 text-slate-400">เกม</label><select id="c-type" class="input-adm bg-[#1a0b2e]"><option value="xo">XO</option><option value="rps">เป่ายิ้งฉุบ</option><option value="cup">ยิงจุดโทษ (Cup)</option></select></div>
+                    <div><label class="text-xs ml-1 text-slate-400">ชนะกี่ตา (Win)</label><input id="c-win" type="number" class="input-adm" value="3"></div>
                 </div>
                 <div class="p-3 bg-white/5 rounded-xl border border-white/10 flex items-center gap-3">
                     <input type="checkbox" id="c-is-trial" class="w-5 h-5 accent-pink-500 cursor-pointer" onchange="document.getElementById('c-bet').disabled = this.checked; document.getElementById('c-bet').value = this.checked ? 0 : '';">
                     <label for="c-is-trial" class="text-sm font-bold text-pink-400 cursor-pointer">ห้องซ้อม (Demo / ไม่กินเงิน)</label>
                 </div>
-                <input id="c-bet" type="number" class="input-cyber" placeholder="ยอดเดิมพัน (Credit)">
+                <input id="c-bet" type="number" class="input-adm" placeholder="ยอดเดิมพัน (Credit)">
                 <div class="flex gap-3 pt-4">
                     <button onclick="UI.modal('create-room', false)" class="flex-1 bg-slate-700 py-3 rounded-xl font-bold">ยกเลิก</button>
                     <button onclick="Admin.createRoom()" class="flex-1 btn-pink py-3">สร้างห้อง</button>
@@ -200,15 +205,41 @@
 
     <div id="modal-edit-user" class="modal-overlay">
         <div class="modal-box animate__animated animate__zoomIn">
-            <h3 class="font-bold text-xl mb-6 text-center">แก้ไขลูกค้า</h3>
+            <h3 class="font-bold text-xl mb-6 text-center text-white">จัดการลูกค้า</h3>
             <input type="hidden" id="e-uid">
-            <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 ml-1">ชื่อเล่น</label><input id="e-nick" class="input-cyber"></div>
-                <div><label class="text-xs text-slate-400 ml-1">เครดิต (แก้ตัวเลขได้เลย)</label><input id="e-credit" type="number" class="input-cyber font-mono text-yellow-400 font-bold text-xl"></div>
-                <div class="flex gap-3 pt-4">
-                    <button onclick="UI.modal('edit-user', false)" class="flex-1 bg-slate-700 py-3 rounded-xl font-bold">ยกเลิก</button>
-                    <button onclick="Admin.saveUser()" class="flex-1 bg-green-600 py-3 rounded-xl font-bold">บันทึก</button>
+            
+            <div class="flex bg-slate-800 rounded-lg p-1 mb-4">
+                <button onclick="Admin.switchEditTab('info')" id="tab-e-info" class="flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition">ข้อมูลทั่วไป</button>
+                <button onclick="Admin.switchEditTab('bonus')" id="tab-e-bonus" class="flex-1 py-2 rounded-md font-bold text-xs text-slate-400 hover:text-white transition">เครดิตฟรี & ล็อค</button>
+            </div>
+
+            <div id="edit-tab-info" class="space-y-4">
+                <div><label class="text-xs text-slate-400 ml-1">ชื่อเล่น</label><input id="e-nick" class="input-adm"></div>
+                <div><label class="text-xs text-slate-400 ml-1">เครดิต (Manual Edit)</label><input id="e-credit" type="number" class="input-adm font-mono text-yellow-400 font-bold text-xl"></div>
+            </div>
+
+            <div id="edit-tab-bonus" class="space-y-4 hidden">
+                <div class="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center">
+                    <h4 class="font-bold text-yellow-400 mb-2">🎁 แจกเครดิตฟรี</h4>
+                    <p class="text-xs text-slate-400 mb-4">เมื่อแจกแล้ว ระบบจะ <span class="text-red-400">ล็อคการถอน</span> อัตโนมัติ</p>
+                    <div class="flex gap-2">
+                        <input id="e-free-amt" type="number" class="input-adm text-center" placeholder="จำนวน">
+                        <button onclick="Admin.giveFreeCredit()" class="bg-yellow-600 hover:bg-yellow-500 px-4 rounded-xl font-bold">แจก</button>
+                    </div>
                 </div>
+                
+                <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-red-400">สถานะการถอน</div>
+                        <div class="text-xs text-slate-400" id="e-lock-status">...</div>
+                    </div>
+                    <button onclick="Admin.toggleLock()" id="btn-toggle-lock" class="bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold">เปลี่ยน</button>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-6 mt-4 border-t border-white/5">
+                <button onclick="UI.modal('edit-user', false)" class="flex-1 bg-slate-700 py-3 rounded-xl font-bold">ปิด</button>
+                <button onclick="Admin.saveUser()" class="flex-1 bg-green-600 py-3 rounded-xl font-bold hover:bg-green-500">บันทึก</button>
             </div>
         </div>
     </div>
@@ -228,30 +259,25 @@
         const Admin = {
             login: () => { auth.signInWithEmailAndPassword(document.getElementById('a-email').value, document.getElementById('a-pass').value).catch(err => Swal.fire('ผิดพลาด', err.message, 'error')); },
             
-            // MAGIC FIX (สร้างข้อมูลจำลองถ้าเว็บโล่ง)
             fixData: async () => {
-                const conf = confirm('ต้องการสร้างข้อมูลตัวอย่างหรือไม่? (กดเมื่อเว็บไม่มีข้อมูล)');
+                const conf = confirm('ต้องการสร้างข้อมูลตัวอย่างหรือไม่?');
                 if(!conf) return;
                 try {
                     await db.collection('config').doc('settings').set({isOpen: true, siteName: 'ZONE.', announcement: 'ยินดีต้อนรับสู่ ZONE.', fbLink: '', maintenanceMsg: 'ระบบปิดปรับปรุง'}, {merge: true});
                     await db.collection('rooms').add({roomName: 'ห้องซ้อมมือ (Auto)', betAmount: 0, gameType: 'xo', players: [], maxWins: 1, createdAt: new Date()});
-                    UI.toast('สร้างข้อมูลเรียบร้อย รีเฟรชหน้าเว็บได้เลย');
+                    UI.toast('สร้างข้อมูลเรียบร้อย');
                 } catch(e) { Swal.fire('Error', e.message, 'error'); }
             },
 
-            // LOAD REQUESTS (Sort Client-side)
             loadRequests: () => {
                 db.collection('requests').onSnapshot(snap => {
                     const all = snap.docs.map(d => ({id:d.id, ...d.data()}));
                     const pending = all.filter(r => r.status === 'pending').sort((a,b) => (b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
-                    
                     document.getElementById('stat-pending').innerText = pending.length;
                     document.getElementById('noti-badge').classList.toggle('hidden', pending.length === 0);
-
                     const list = document.getElementById('request-list');
                     if(pending.length === 0) { list.innerHTML = ''; document.getElementById('empty-req').classList.remove('hidden'); return; }
                     document.getElementById('empty-req').classList.add('hidden');
-                    
                     list.innerHTML = pending.map(r => {
                         const isDep = r.type === 'deposit';
                         const color = isDep ? 'text-green-400' : 'text-red-400';
@@ -262,10 +288,7 @@
                             <td class="p-4"><span class="${badge} px-2 py-1 rounded text-xs font-bold">${typeTxt}</span></td>
                             <td class="p-4 font-mono font-bold ${color} text-lg">${r.amount.toLocaleString()}</td>
                             <td class="p-4 text-xs text-slate-400">${isDep ? `เวลา: ${r.timeStr}` : `<button onclick="Admin.viewBank('${r.uid}')" class="text-pink-400 hover:underline"><i class="fa-solid fa-eye mr-1"></i>ดูบัญชี</button>`}</td>
-                            <td class="p-4 text-center">
-                                <button onclick="Admin.process('${r.id}', 'approved', '${r.uid}', '${r.type}', ${r.amount})" class="bg-green-600 hover:bg-green-500 text-white w-8 h-8 rounded-lg shadow mr-2 transition"><i class="fa-solid fa-check"></i></button>
-                                <button onclick="Admin.process('${r.id}', 'rejected', '${r.uid}', '${r.type}', ${r.amount})" class="bg-slate-700 hover:bg-red-600 text-white w-8 h-8 rounded-lg shadow transition"><i class="fa-solid fa-xmark"></i></button>
-                            </td>
+                            <td class="p-4 text-center"><button onclick="Admin.process('${r.id}', 'approved', '${r.uid}', '${r.type}', ${r.amount})" class="bg-green-600 hover:bg-green-500 text-white w-8 h-8 rounded-lg shadow mr-2 transition"><i class="fa-solid fa-check"></i></button><button onclick="Admin.process('${r.id}', 'rejected', '${r.uid}', '${r.type}', ${r.amount})" class="bg-slate-700 hover:bg-red-600 text-white w-8 h-8 rounded-lg shadow transition"><i class="fa-solid fa-xmark"></i></button></td>
                         </tr>`;
                     }).join('');
                 });
@@ -321,12 +344,75 @@
 
             filterUsers: () => { const t = document.getElementById('search-user').value.toLowerCase(); Admin.renderUsers(allUsers.filter(u => (u.nickname||'').toLowerCase().includes(t) || (u.email||'').toLowerCase().includes(t))); },
             renderUsers: (users) => {
-                document.getElementById('admin-user-list').innerHTML = users.map(u => `<tr class="hover:bg-white/5 border-b border-white/5 transition"><td class="p-4 pl-6"><div class="font-bold text-white text-lg">${u.nickname}</div><div class="text-xs text-slate-500 font-mono select-all">${u.id}</div><div class="text-xs text-pink-400">${u.email}</div></td><td class="p-4 text-xs text-slate-300"><div>${u.bankName||'-'}</div><div class="font-mono select-all">${u.bankAcc||'-'}</div></td><td class="p-4 font-mono font-bold text-yellow-400 text-xl">${(u.credit||0).toLocaleString()}</td><td class="p-4"><button onclick="Admin.openEdit('${u.id}', '${u.nickname}', ${u.credit})" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-xs font-bold">แก้ไข</button></td></tr>`).join('');
+                document.getElementById('admin-user-list').innerHTML = users.map(u => {
+                    const isLocked = u.isFreeCredit;
+                    const statusBadge = isLocked ? '<span class="lock-badge"><i class="fa-solid fa-lock"></i> LOCK</span>' : '<span class="text-green-400 text-xs font-bold">ปกติ</span>';
+                    return `<tr class="hover:bg-white/5 border-b border-white/5 transition"><td class="p-4 pl-6"><div class="font-bold text-white text-lg">${u.nickname}</div><div class="text-xs text-slate-500 font-mono select-all">${u.id}</div><div class="text-xs text-pink-400">${u.email}</div></td><td class="p-4 text-xs text-slate-300"><div>${u.bankName||'-'}</div><div class="font-mono select-all">${u.bankAcc||'-'}</div></td><td class="p-4 font-mono font-bold text-yellow-400 text-xl">${(u.credit||0).toLocaleString()} <br> ${statusBadge}</td><td class="p-4"><button onclick="Admin.openEdit('${u.id}')" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-xs font-bold">จัดการ</button></td></tr>`;
+                }).join('');
             },
-            openEdit: (id, n, c) => { document.getElementById('e-uid').value=id; document.getElementById('e-nick').value=n; document.getElementById('e-credit').value=c; UI.modal('edit-user', true); },
+            
+            // --- EDIT USER & FREE CREDIT ---
+            currentEditUser: null,
+            openEdit: (id) => {
+                Admin.currentEditUser = allUsers.find(u => u.id === id);
+                const u = Admin.currentEditUser;
+                document.getElementById('e-uid').value = id;
+                document.getElementById('e-nick').value = u.nickname;
+                document.getElementById('e-credit').value = u.credit;
+                
+                // Update Lock Status Text
+                const lockTxt = document.getElementById('e-lock-status');
+                const btnLock = document.getElementById('btn-toggle-lock');
+                if(u.isFreeCredit) {
+                    lockTxt.innerHTML = '<span class="text-red-400 font-bold">🔒 ติดเงื่อนไข (ถอนไม่ได้)</span>';
+                    btnLock.innerText = 'ปลดล็อค';
+                    btnLock.className = 'bg-green-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500';
+                } else {
+                    lockTxt.innerHTML = '<span class="text-green-400 font-bold">✔ ปกติ (ถอนได้)</span>';
+                    btnLock.innerText = 'ล็อค';
+                    btnLock.className = 'bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500';
+                }
+
+                UI.modal('edit-user', true);
+                Admin.switchEditTab('info');
+            },
+            switchEditTab: (tab) => {
+                document.getElementById('edit-tab-info').classList.toggle('hidden', tab!=='info');
+                document.getElementById('edit-tab-bonus').classList.toggle('hidden', tab!=='bonus');
+                document.getElementById('tab-e-info').className = tab==='info' ? 'flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition' : 'flex-1 py-2 rounded-md font-bold text-xs text-slate-400 hover:text-white transition';
+                document.getElementById('tab-e-bonus').className = tab==='bonus' ? 'flex-1 py-2 rounded-md font-bold text-xs bg-pink-600 text-white transition' : 'flex-1 py-2 rounded-md font-bold text-xs text-slate-400 hover:text-white transition';
+            },
+            giveFreeCredit: () => {
+                const amt = parseFloat(document.getElementById('e-free-amt').value);
+                const uid = document.getElementById('e-uid').value;
+                if(!amt) return UI.toast('ใส่จำนวนเงิน', 'warning');
+                
+                db.collection('users').doc(uid).update({
+                    credit: firebase.firestore.FieldValue.increment(amt),
+                    isFreeCredit: true // LOCK WITHDRAWAL
+                }).then(() => {
+                    db.collection('transactions').add({ uid, type: 'bonus_credit', amount: amt, note: 'Free Credit (Locked)', timestamp: new Date() });
+                    UI.toast(`แจก ${amt} เครดิต (ล็อคถอน)`);
+                    UI.modal('edit-user', false);
+                });
+            },
+            toggleLock: () => {
+                const uid = document.getElementById('e-uid').value;
+                const currentStatus = Admin.currentEditUser.isFreeCredit;
+                db.collection('users').doc(uid).update({ isFreeCredit: !currentStatus }).then(() => {
+                    UI.toast(currentStatus ? 'ปลดล็อคแล้ว' : 'ล็อคบัญชีแล้ว');
+                    UI.modal('edit-user', false);
+                });
+            },
             saveUser: () => {
                 const id=document.getElementById('e-uid').value, c=parseFloat(document.getElementById('e-credit').value), n=document.getElementById('e-nick').value;
-                db.collection('users').doc(id).update({ nickname: n, credit: c }).then(() => { UI.toast('บันทึกแล้ว'); UI.modal('edit-user', false); });
+                db.collection('users').doc(id).get().then(doc => {
+                    const old = doc.data().credit;
+                    db.collection('users').doc(id).update({ nickname: n, credit: c }).then(() => { 
+                        if(old !== c) db.collection('transactions').add({ uid: id, type: 'admin_edit', amount: c-old, note: `Edit ${old}->${c}`, timestamp: new Date() });
+                        UI.toast('บันทึกข้อมูลแล้ว'); UI.modal('edit-user', false); 
+                    });
+                });
             },
 
             loadSettings: () => { db.collection('config').doc('settings').onSnapshot(d => { if(d.exists) { const v=d.data(); document.getElementById('set-status').checked=v.isOpen!==false; document.getElementById('set-name').value=v.siteName||''; document.getElementById('set-annc').value=v.announcement||''; document.getElementById('set-fb').value=v.fbLink||''; document.getElementById('set-msg').value=v.maintenanceMsg||''; } }); },
