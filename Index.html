@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN | ROOM FIXED</title>
+    <title>ZONE. | ADMIN CENTER</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600;800&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
@@ -73,8 +73,8 @@
         <nav class="flex-1 space-y-1">
             <div onclick="UI.tab('dash')" id="tab-dash" class="menu-item active"><i class="fa-solid fa-chart-line w-6"></i> แดชบอร์ด</div>
             <div onclick="UI.tab('trans')" id="tab-trans" class="menu-item"><i class="fa-solid fa-money-bill-transfer w-6"></i> อนุมัติฝาก/ถอน <span id="noti-badge" class="ml-auto bg-red-500 text-white text-[10px] px-2 rounded-full hidden">!</span></div>
-            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> จัดการห้องเกม</div>
             <div onclick="UI.tab('users')" id="tab-users" class="menu-item"><i class="fa-solid fa-users w-6"></i> จัดการลูกค้า</div>
+            <div onclick="UI.tab('rooms')" id="tab-rooms" class="menu-item"><i class="fa-solid fa-gamepad w-6"></i> ห้องเกม</div>
             <div onclick="UI.tab('settings')" id="tab-settings" class="menu-item"><i class="fa-solid fa-gears w-6"></i> ตั้งค่าเว็บไซต์</div>
         </nav>
         <button onclick="auth.signOut()" class="bg-red-500/10 text-red-400 py-3 rounded-xl font-bold hover:bg-red-500/20 transition mt-4"><i class="fa-solid fa-power-off mr-2"></i> ออกจากระบบ</button>
@@ -131,21 +131,10 @@
                         </div>
                     </div>
                     <div class="p-4 rounded-xl bg-blue-900/20 text-xs text-blue-200 border border-blue-500/20">
-                        <h4 class="font-bold mb-2">หมายเหตุ:</h4>
-                        <p>หากลูกค้าติดสถานะ <span class="text-red-400 font-bold">LOCK</span> จะถอนไม่ได้ ต้องไปปลดล็อคที่หน้า "จัดการลูกค้า"</p>
+                        <h4 class="font-bold mb-2">หมายเหตุการถอน:</h4>
+                        <p>หากลูกค้าติดสถานะ <span class="text-red-400 font-bold">LOCK</span> จะถอนไม่ได้ ต้องไปปลดล็อคที่หน้า "จัดการลูกค้า" ก่อน</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div id="page-rooms" class="hidden animate__animated animate__fadeIn">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold font-display">จัดการห้องเกม</h1>
-                <button onclick="UI.modal('create-room', true)" class="btn-pink px-6 py-2 shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> สร้างห้องใหม่</button>
-            </div>
-            
-            <div id="admin-room-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="col-span-full py-10 text-center text-slate-500 animate-pulse">กำลังโหลดข้อมูลห้อง...</div>
             </div>
         </div>
 
@@ -162,12 +151,28 @@
             </div>
         </div>
 
+        <div id="page-rooms" class="hidden animate__animated animate__fadeIn">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold font-display">จัดการห้องเกม</h1>
+                <button onclick="UI.modal('create-room', true)" class="btn-pink px-6 py-2 shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> สร้างห้องใหม่</button>
+            </div>
+            <div id="admin-room-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full py-10 text-center text-slate-500 animate-pulse">กำลังโหลดข้อมูลห้อง...</div>
+            </div>
+        </div>
+
         <div id="page-settings" class="hidden animate__animated animate__fadeIn">
             <h1 class="text-3xl font-bold mb-8 font-display">ตั้งค่าเว็บไซต์</h1>
             <div class="glass-card p-8 max-w-2xl">
                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 mb-6">
-                    <div><div class="font-bold text-lg">สถานะเซิร์ฟเวอร์</div><div class="text-xs text-slate-400">ปิดปรับปรุงชั่วคราว (ลูกค้าเข้าไม่ได้)</div></div>
-                    <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="set-status" class="sr-only peer"><div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div></label>
+                    <div>
+                        <div class="font-bold text-lg">สถานะเว็บไซต์</div>
+                        <div class="text-xs text-slate-400" id="status-text-display">...</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="set-status" class="sr-only peer" onchange="Admin.updateStatusText()">
+                        <div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
                 </div>
                 <div class="space-y-4">
                     <div><label class="text-xs text-slate-400 ml-1">ชื่อเว็บ (Title)</label><input id="set-name" class="input-adm"></div>
@@ -346,24 +351,16 @@
                 }).join('');
             },
             
-            // --- EDIT USER LOGIC ---
-            currentEditUser: null,
             openEdit: (id) => {
                 Admin.currentEditUser = allUsers.find(u => u.id === id);
                 const u = Admin.currentEditUser;
                 document.getElementById('e-uid').value = id;
                 document.getElementById('e-nick').value = u.nickname;
                 document.getElementById('e-credit').value = u.credit;
-                
                 const lockTxt = document.getElementById('e-lock-status');
                 const btnLock = document.getElementById('btn-toggle-lock');
-                if(u.isFreeCredit) {
-                    lockTxt.innerHTML = '<span class="text-red-400 font-bold">🔒 ติดเงื่อนไข (ถอนไม่ได้)</span>';
-                    btnLock.innerText = 'ปลดล็อค'; btnLock.className = 'bg-green-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500';
-                } else {
-                    lockTxt.innerHTML = '<span class="text-green-400 font-bold">✔ ปกติ (ถอนได้)</span>';
-                    btnLock.innerText = 'ล็อค'; btnLock.className = 'bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500';
-                }
+                if(u.isFreeCredit) { lockTxt.innerHTML = '<span class="text-red-400 font-bold">🔒 ติดเงื่อนไข (ถอนไม่ได้)</span>'; btnLock.innerText = 'ปลดล็อค'; btnLock.className = 'bg-green-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500'; } 
+                else { lockTxt.innerHTML = '<span class="text-green-400 font-bold">✔ ปกติ (ถอนได้)</span>'; btnLock.innerText = 'ล็อค'; btnLock.className = 'bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500'; }
                 UI.modal('edit-user', true); Admin.switchEditTab('info');
             },
             switchEditTab: (tab) => {
@@ -392,7 +389,17 @@
                 });
             },
 
-            loadSettings: () => { db.collection('config').doc('settings').onSnapshot(d => { if(d.exists) { const v=d.data(); document.getElementById('set-status').checked=v.isOpen!==false; document.getElementById('set-name').value=v.siteName||''; document.getElementById('set-annc').value=v.announcement||''; document.getElementById('set-fb').value=v.fbLink||''; document.getElementById('set-msg').value=v.maintenanceMsg||''; } }); },
+            loadSettings: () => { db.collection('config').doc('settings').onSnapshot(d => { if(d.exists) { const v=d.data(); 
+                document.getElementById('set-status').checked = v.isOpen !== false; 
+                Admin.updateStatusText(); // Update Text
+                document.getElementById('set-name').value=v.siteName||''; document.getElementById('set-annc').value=v.announcement||''; document.getElementById('set-fb').value=v.fbLink||''; document.getElementById('set-msg').value=v.maintenanceMsg||''; 
+            } }); },
+            updateStatusText: () => {
+                const isOpen = document.getElementById('set-status').checked;
+                const txt = document.getElementById('status-text-display');
+                if(isOpen) { txt.innerText = "🟢 เปิดให้บริการ"; txt.className = "text-xs text-green-400 font-bold"; }
+                else { txt.innerText = "🔴 ปิดปรับปรุง"; txt.className = "text-xs text-red-400 font-bold"; }
+            },
             saveSettings: () => { db.collection('config').doc('settings').set({ isOpen: document.getElementById('set-status').checked, siteName: document.getElementById('set-name').value, announcement: document.getElementById('set-annc').value, fbLink: document.getElementById('set-fb').value, maintenanceMsg: document.getElementById('set-msg').value }, { merge: true }); UI.toast('บันทึกแล้ว'); }
         };
 
@@ -415,7 +422,7 @@
                     list.innerHTML = rooms.map(r => { 
                         const isTrial = r.betAmount === 0;
                         const typeMap = {'xo':'XO', 'rps':'เป่ายิ้งฉุบ', 'cup':'ยิงจุดโทษ'};
-                        return `<div class="glass-card p-5 border-l-4 ${isTrial?'border-green-500':'border-pink-500'} flex justify-between items-center group hover:bg-white/5 relative overflow-hidden"><div class="relative z-10"><div class="font-bold text-lg text-white flex items-center gap-2">${r.roomName} ${isTrial ? '<span class="bg-green-500 text-[10px] px-2 rounded text-white">DEMO</span>' : ''}</div><div class="text-xs text-slate-400 font-mono mt-1 bg-slate-900/50 px-2 py-1 rounded inline-block"><span class="text-pink-400 font-bold">${typeMap[r.gameType]||'GAME'}</span> | Pass: ${r.password} | Bet: ${r.betAmount}</div></div><button onclick="Admin.deleteRoom('${r.id}')" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition border border-red-500/20 z-10"><i class="fa-solid fa-trash"></i> ลบ</button></div>`; 
+                        return `<div class="glass-card p-5 border-l-4 ${isTrial?'border-green-500':'border-pink-500'} flex justify-between items-center group hover:bg-white/5 relative overflow-hidden"><div class="relative z-10"><div class="font-bold text-lg text-white flex items-center gap-2">${r.roomName} ${isTrial ? '<span class="bg-green-500 text-[10px] px-2 rounded text-white">DEMO</span>' : ''}</div><div class="text-xs text-slate-400 font-mono mt-1 bg-slate-900/50 px-2 py-1 rounded inline-block"><span class="text-pink-400 font-bold">${typeMap[r.gameType]}</span> | Pass: ${r.password} | Bet: ${r.betAmount}</div></div><button onclick="Admin.deleteRoom('${r.id}')" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition border border-red-500/20 z-10"><i class="fa-solid fa-trash"></i> ลบ</button></div>`; 
                     }).join('');
                 });
 
